@@ -2,13 +2,10 @@ package com.dan.learn.lab2.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -73,56 +70,37 @@ public class DragAddAutoListView extends ListView implements AbsListView.OnScrol
                 break;
             case MotionEvent.ACTION_MOVE:
                 float distanceY = y - mDownY;
-                Log.d(TAG, " MOVE -------------- y:" + y + " down y:" + mDownY + " distance :" + distanceY);
-                //向下  y 值递增
-                //向上  y 值递减
-
-                if (mFirstVisibleItem == 0) {
-                    if (y > mLastY) {
-                        // 向下
-                        if (distanceY > 0 && distanceY <= MAX_Y_DISTANCE) {
-                            float height = distanceY * SCROLL_RADIO;
-                            Log.d(TAG, "MOVE 向下 height ------------ : " + height);
-                            changeHeight((int) height);
-                        }
-                    } else {
-                        //向上
-                        //padding 是负值，然后递减 至 MAX_PADDING  - MAX_PADDING --> 0
-                        if (distanceY < 0) {
-//                            changeHeight((int) distanceY);
-                        } else {
-                            int paddingTop = mHeader.getPaddingTop();
-                            int paddingBottom = mHeader.getPaddingBottom();
-                            Log.d(TAG, "打印 --------- Padding top:" + paddingTop + " bottom:" + paddingBottom);
-
-//                            distanceY = MAX_Y_PADDING - (distanceY * SCROLL_RADIO);
-//                            float height = MAX_Y_PADDING - ();
-//                            changeHeight((int) -distanceY);
-                            
-
-                        }
-
-                        Log.d(TAG, "滑动 ----------- distanceY:" + distanceY + " y:" + y + " lastY:" + mLastY);
+//                LogUtil.d("打印 MOVE 事件 --------- y:" + y + " down y:" + mDownY + " distance:" + distanceY);
+                float result;
+                if (distanceY > 0 && distanceY <= MAX_Y_DISTANCE && mFirstVisibleItem == 0) {
+                    result = (-MAX_Y_PADDING + distanceY) * SCROLL_RADIO;
+                    changeHeight((int) result);
+                } else if (distanceY < 0 && mFirstVisibleItem == 0) {
+                    result = -MAX_Y_PADDING - distanceY;
+                    if (result < -MAX_Y_PADDING) {
+                        result = -MAX_Y_PADDING;
                     }
+                    changeHeight((int) result);
                 }
 
-                mLastY = y;
                 break;
             case MotionEvent.ACTION_UP:
-//                float distance = y - mDownY;
-//                Log.d(TAG, " UP -------------- y:" + y + " down y:" + mDownY + " distance :" + distance);
-//
-//                if (distance > 0) {
-//                    //向下滑
-//                    if (distance >= mHeaderHeight * 2) {
-//                        changeHeight(mHeaderHeight);
-//                    } else {
-//                        changeHeight(-mHeaderHeight);
-//                    }
-//                } else {
-//                    //向上
-//                    changeHeight(-mHeaderHeight);
-//                }
+                float distance = y - mDownY;
+//                LogUtil.d("打印UP 参数 ---------- y:" + y + " down y:" + mDownY + " distance:" + distance);
+                if (distance > 0) {
+                    //向下滑
+                    if (distance >= mHeaderHeight * 2) {
+                        changeHeight(mHeaderHeight);
+//                        if (mListener != null) {
+//                            mListener.onDragHappen();
+//                        }
+                    } else {
+                        changeHeight(-mHeaderHeight);
+                    }
+                } else {
+                    //向上
+                    changeHeight(-mHeaderHeight);
+                }
                 break;
         }
         return super.onTouchEvent(ev);
@@ -144,6 +122,10 @@ public class DragAddAutoListView extends ListView implements AbsListView.OnScrol
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         mFirstVisibleItem = firstVisibleItem;
+    }
+
+    public void recoverFromAction() {
+        changeHeight(-mHeaderHeight);
     }
 
     private void whenActionRelease() {

@@ -1,6 +1,7 @@
 package com.dan.learn.lab2.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,6 +101,7 @@ public class MainFuncAdapter extends BaseExpandableListAdapter {
         FuncEntity child = getChild(groupPosition, childPosition);
         mChildHolder.tv_name.setText(child.getName());
         mChildHolder.tv_desc.setText(child.getDesc());
+        mChildHolder.tv_desc.setVisibility(TextUtils.isEmpty(child.getDesc()) ? View.GONE : View.VISIBLE);
         return convertView;
     }
 

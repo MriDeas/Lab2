@@ -10,7 +10,9 @@ import android.widget.ExpandableListView;
 import com.dan.learn.lab2.adapter.MainFuncAdapter;
 import com.dan.learn.lab2.entity.FuncEntity;
 import com.dan.learn.lab2.entity.FuncGroupEntity;
+import com.dan.learn.lab2.repository.MainPageRepository;
 import com.dan.learn.lab2.ui.RxJavaBasicActivity;
+import com.dan.learn.lab2.ui.activity.DragViewActivity;
 
 import java.util.ArrayList;
 
@@ -30,18 +32,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        FuncEntity child = new FuncEntity();
-        child.setName("RxJava 基础使用");
-        child.setTarget(RxJavaBasicActivity.class);
-
-        ArrayList<FuncEntity> entities = new ArrayList<>();
-        entities.add(child);
-        FuncGroupEntity group = new FuncGroupEntity();
-        group.setTitle("RxJava");
-        group.setChildren(entities);
-        ArrayList<FuncGroupEntity> groups = new ArrayList<>();
-        groups.add(group);
-        mAdapter = new MainFuncAdapter(groups, this);
+        MainPageRepository instance = MainPageRepository.getInstance();
+        instance.clear();
+        instance.createGroup("RxJava")
+                .addChild("RxJava基础", "", RxJavaBasicActivity.class);
+        instance.createGroup("拖拽控件").addChild("拖拽控件","", DragViewActivity.class);
+        mAdapter = new MainFuncAdapter(MainPageRepository.getInstance().getData(), this);
         elv_expand_list.setAdapter(mAdapter);
     }
 

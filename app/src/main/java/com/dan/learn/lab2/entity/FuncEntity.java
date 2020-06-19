@@ -11,27 +11,21 @@ public class FuncEntity {
     private String desc;
     private Class target;
 
-    public String getName() {
-        return name;
+    FuncEntity(String name, String desc, Class target) {
+        this.name = name;
+        this.desc = desc;
+        this.target = target;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public String getDesc() {
         return desc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
     public Class getTarget() {
         return target;
-    }
-
-    public void setTarget(Class target) {
-        this.target = target;
     }
 }

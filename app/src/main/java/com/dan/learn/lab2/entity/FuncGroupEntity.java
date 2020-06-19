@@ -1,5 +1,6 @@
 package com.dan.learn.lab2.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,6 +11,10 @@ import java.util.List;
  */
 public class FuncGroupEntity {
 
+    public FuncGroupEntity(String title) {
+        this.title = title;
+    }
+
     private String title;
     private List<FuncEntity> children;
 
@@ -17,15 +22,22 @@ public class FuncGroupEntity {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public List<FuncEntity> getChildren() {
         return children;
     }
 
-    public void setChildren(List<FuncEntity> children) {
-        this.children = children;
+    public void addChild(String name, String desc, Class target) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        FuncEntity child = new FuncEntity(name, desc, target);
+        children.add(child);
+    }
+
+    public void clear() {
+        if (children != null) {
+            children.clear();
+        }
     }
 }
