@@ -38,9 +38,9 @@ public class CustomWidgetFragment extends BaseFragment {
     }
 
     private void initView() {
-        LayoutInflater inflater = getLayoutInflater();
-        View advertisement = inflater.inflate(R.layout.view_advertisement_0, null);
-        vf_flipper.addView(advertisement);
+//        LayoutInflater inflater = getLayoutInflater();
+//        View advertisement = inflater.inflate(R.layout.view_advertisement_0, null);
+//        vf_flipper.addView(advertisement);
     }
 
 }
