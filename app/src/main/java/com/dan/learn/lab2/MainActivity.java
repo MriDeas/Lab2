@@ -12,6 +12,7 @@ import com.dan.learn.lab2.entity.FuncEntity;
 import com.dan.learn.lab2.entity.FuncGroupEntity;
 import com.dan.learn.lab2.repository.MainPageRepository;
 import com.dan.learn.lab2.ui.RxJavaBasicActivity;
+import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 
 import java.util.ArrayList;
@@ -36,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
         instance.clear();
         instance.createGroup("RxJava")
                 .addChild("RxJava基础", "", RxJavaBasicActivity.class);
-        instance.createGroup("拖拽控件").addChild("拖拽控件","", DragViewActivity.class);
+        FuncGroupEntity customViewGroup = instance.createGroup("自定义控件");
+        customViewGroup.addChild("拖拽控件","", DragViewActivity.class);
+        customViewGroup.addChild("自定义控件","", CustomWidgetsActivity.class);
         mAdapter = new MainFuncAdapter(MainPageRepository.getInstance().getData(), this);
         elv_expand_list.setAdapter(mAdapter);
     }

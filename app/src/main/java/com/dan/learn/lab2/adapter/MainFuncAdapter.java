@@ -23,13 +23,11 @@ import java.util.List;
 public class MainFuncAdapter extends BaseExpandableListAdapter {
 
     private List<FuncGroupEntity> mData;
-    private Context mContext;
 
     private LayoutInflater mInflater;
 
     public MainFuncAdapter(List<FuncGroupEntity> data, Context context) {
         this.mData = data;
-        this.mContext = context;
         mInflater = LayoutInflater.from(context);
     }
 

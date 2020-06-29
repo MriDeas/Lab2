@@ -26,11 +26,14 @@ public class DragViewActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_drag_view);
-
         ListView lv_list = findViewById(R.id.lv_list);
         inflater = LayoutInflater.from(this);
         bindingData(lv_list);
+    }
+
+    @Override
+    protected int getContentLayout() {
+        return R.layout.activity_drag_view;
     }
 
     private void bindingData(ListView lv) {
