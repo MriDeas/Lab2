@@ -35,7 +35,7 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(getContentLayout(), container, false);
-        mBinder = ButterKnife.bind(rootView);
+        mBinder = ButterKnife.bind(this,rootView);
         return rootView;
     }
 

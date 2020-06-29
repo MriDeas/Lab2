@@ -41,7 +41,7 @@ public class CustomWidgetsActivity extends BaseActivity {
     private void initView() {
         tl_vp_tab.setupWithViewPager(vp_pager);
         ArrayList<BaseFragment> fragments = new ArrayList<>();
-        fragments.add(CustomWidgetFragment.getInstance("Little Widget"));
+        fragments.add(CustomWidgetFragment.getInstance("小控件"));
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), fragments);
         vp_pager.setAdapter(adapter);
     }
