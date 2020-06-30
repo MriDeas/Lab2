@@ -1,11 +1,7 @@
 package com.dan.learn.lab2.ui.fragment;
 
-import android.content.res.XmlResourceParser;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;

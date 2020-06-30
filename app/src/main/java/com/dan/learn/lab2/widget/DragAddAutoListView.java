@@ -2,6 +2,7 @@ package com.dan.learn.lab2.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dan.learn.lab2.R;
+import com.dan.learn.lab2.utils.SizeUtil;
 
 
 /**
@@ -19,25 +21,23 @@ import com.dan.learn.lab2.R;
  * Modify time:
  */
 public class DragAddAutoListView extends ListView implements AbsListView.OnScrollListener {
-
     /**
-     * 1. 手动快速向下拉 -- 自动滑动  到达顶部 -> 不允许出现header
-     * 2. 手动滑动当滑动header完全呈现  松手后展示header
+     * 1. 当第一个可见条目是列表中第一个元素时 可向下拖动
+     * 2. 设定下拉过程与header部分高度变动的比例，header部分根据比率和滑动实际距离变化
+     * 3. UP事件时，判断当前滑动距离
      */
 
     private static final String TAG = DragAddAutoListView.class.getCanonicalName();
-
     private static final float SCROLL_RADIO = 0.35f;
-    private static final int MAX_Y_PADDING = 200;
-    private static final int MAX_Y_DISTANCE = 720;
-
-    private int mHeaderHeight;
+    private static int MAX_Y_PADDING;
+    private static int MAX_Y_DISTANCE;
 
     private View mHeader;
 
     private int mFirstVisibleItem;
     private float mDownY;
     private float mLastY;
+    private int mHeaderHeight;
 
     public DragAddAutoListView(Context context) {
         super(context);
@@ -50,13 +50,13 @@ public class DragAddAutoListView extends ListView implements AbsListView.OnScrol
     {
         LayoutInflater mInflater = LayoutInflater.from(getContext());
         mHeader = mInflater.inflate(R.layout.header_of_drag_listview, null, false);
-
-
         mHeader.measure(0, 0);
         mHeaderHeight = mHeader.getMeasuredHeight();
+        MAX_Y_PADDING = (int) (mHeaderHeight + SizeUtil.dp2px(100));
+        MAX_Y_DISTANCE = (int) (SizeUtil.getScreenParam(SizeUtil.COMMAND_SCREEN_WIDTH) * 0.6f);
 
         addHeaderView(mHeader);
-        mHeader.setPadding(0, -MAX_Y_PADDING, 0, 0);
+        setPadding(0, -mHeaderHeight, 0, 0);
         setOnScrollListener(this);
     }
 
@@ -66,41 +66,13 @@ public class DragAddAutoListView extends ListView implements AbsListView.OnScrol
         float y = ev.getY();
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mDownY = y;
+
                 break;
             case MotionEvent.ACTION_MOVE:
-                float distanceY = y - mDownY;
-//                LogUtil.d("打印 MOVE 事件 --------- y:" + y + " down y:" + mDownY + " distance:" + distanceY);
-                float result;
-                if (distanceY > 0 && distanceY <= MAX_Y_DISTANCE && mFirstVisibleItem == 0) {
-                    result = (-MAX_Y_PADDING + distanceY) * SCROLL_RADIO;
-                    changeHeight((int) result);
-                } else if (distanceY < 0 && mFirstVisibleItem == 0) {
-                    result = -MAX_Y_PADDING - distanceY;
-                    if (result < -MAX_Y_PADDING) {
-                        result = -MAX_Y_PADDING;
-                    }
-                    changeHeight((int) result);
-                }
 
                 break;
             case MotionEvent.ACTION_UP:
-                float distance = y - mDownY;
-//                LogUtil.d("打印UP 参数 ---------- y:" + y + " down y:" + mDownY + " distance:" + distance);
-                if (distance > 0) {
-                    //向下滑
-                    if (distance >= mHeaderHeight * 2) {
-                        changeHeight(mHeaderHeight);
-//                        if (mListener != null) {
-//                            mListener.onDragHappen();
-//                        }
-                    } else {
-                        changeHeight(-mHeaderHeight);
-                    }
-                } else {
-                    //向上
-                    changeHeight(-mHeaderHeight);
-                }
+
                 break;
         }
         return super.onTouchEvent(ev);
@@ -114,7 +86,7 @@ public class DragAddAutoListView extends ListView implements AbsListView.OnScrol
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_FLING) {
-            changeHeight(-mHeaderHeight);
+
         }
     }
 
@@ -124,9 +96,6 @@ public class DragAddAutoListView extends ListView implements AbsListView.OnScrol
         mFirstVisibleItem = firstVisibleItem;
     }
 
-    public void recoverFromAction() {
-        changeHeight(-mHeaderHeight);
-    }
 
     private void whenActionRelease() {
         Toast.makeText(getContext(), "释放", Toast.LENGTH_SHORT).show();

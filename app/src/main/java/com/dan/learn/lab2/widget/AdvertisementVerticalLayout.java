@@ -95,10 +95,6 @@ public class AdvertisementVerticalLayout extends FrameLayout {
         animIn();
     }
 
-    private void animInDelay() {
-        postDelayed(this::animIn, interval);
-    }
-
     private void animOutDelay() {
         postDelayed(this::animOut, interval);
     }
