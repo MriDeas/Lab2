@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AdvertisementVerticalLayout">
+        <attr name="animIn" format="reference" />
+        <attr name="animOut" format="reference" />
+        <attr name="interval" format="integer" />
+        <attr name="autoStart" format="boolean"/>
+    </declare-styleable>
+</resources>

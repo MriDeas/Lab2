@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,5 +22,14 @@
 
         <include layout="@layout/view_advertisement_0" />
     </ViewFlipper>
+
+    <com.dan.learn.lab2.widget.AdvertisementVerticalLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:autoStart="true"
+        app:interval="5000">
+
+        <include layout="@layout/view_advertisement_0" />
+    </com.dan.learn.lab2.widget.AdvertisementVerticalLayout>
 
 </LinearLayout>

@@ -20,6 +20,7 @@ public abstract class BaseFragment extends Fragment {
     private Unbinder mBinder;
 
     protected abstract int getContentLayout();
+//    protected abstract void initView(View rootView);
 
     private String mTitle;
 
