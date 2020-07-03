@@ -7,9 +7,13 @@
     tools:context=".ui.activity.DragViewActivity">
 
     <com.dan.learn.lab2.widget.DragAddAutoListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <com.dan.learn.lab2.widget.DragListView
         android:id="@+id/lv_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

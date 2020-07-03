@@ -5,6 +5,7 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ public class DragViewActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(Window.FEATURE_NO_TITLE);
         ListView lv_list = findViewById(R.id.lv_list);
         inflater = LayoutInflater.from(this);
         bindingData(lv_list);

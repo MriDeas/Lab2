@@ -1,6 +1,7 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -9,6 +10,7 @@ import com.dan.learn.lab2.adapter.FragmentsAdapter;
 import com.dan.learn.lab2.ui.BaseActivity;
 import com.dan.learn.lab2.ui.BaseFragment;
 import com.dan.learn.lab2.ui.fragment.CustomWidgetFragment;
+import com.dan.learn.lab2.ui.fragment.TextViewFragment;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class CustomWidgetsActivity extends BaseActivity {
         tl_vp_tab.setupWithViewPager(vp_pager);
         ArrayList<BaseFragment> fragments = new ArrayList<>();
         fragments.add(CustomWidgetFragment.getInstance("小控件"));
+        fragments.add(TextViewFragment.newInstance("TextView"));
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), fragments);
         vp_pager.setAdapter(adapter);
     }

@@ -31,10 +31,7 @@ public class CustomWidgetFragment extends BaseFragment {
         return R.layout.fragment_custom_widget;
     }
 
-//    @Override
-//    protected void initView(View rootView) {
-//
-//    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
