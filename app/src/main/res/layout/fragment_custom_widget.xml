@@ -32,4 +32,15 @@
         <include layout="@layout/view_advertisement_0" />
     </com.dan.learn.lab2.widget.AdvertisementVerticalLayout>
 
+    <Button
+        android:id="@+id/bt_action"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="action" />
+
+    <ImageView
+        android:id="@+id/iv_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 </LinearLayout>
