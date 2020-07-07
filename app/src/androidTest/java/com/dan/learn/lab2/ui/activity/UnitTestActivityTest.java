@@ -2,12 +2,9 @@ package com.dan.learn.lab2.ui.activity;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.Toast;
 
-import androidx.test.InstrumentationRegistry;
 import androidx.test.espresso.FailureHandler;
 import androidx.test.espresso.IdlingRegistry;
-import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.base.DefaultFailureHandler;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -16,7 +13,6 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.entity.Item;
-import com.dan.learn.lab2.idle.ActivityIdlingResource;
 import com.dan.learn.lab2.idle.SampleIdlingResource;
 
 import org.hamcrest.Matcher;
@@ -28,20 +24,23 @@ import org.junit.runner.RunWith;
 
 import java.util.Map;
 
-import static androidx.test.espresso.Espresso.*;
-import static androidx.test.espresso.action.ViewActions.*;
-import static androidx.test.espresso.assertion.ViewAssertions.*;
-import static androidx.test.espresso.matcher.ViewMatchers.*;
+import static androidx.test.espresso.Espresso.onData;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.setFailureHandler;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasSibling;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItemInArray;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 
 /**
@@ -78,6 +77,10 @@ public class UnitTestActivityTest {
         checkExist();
         listChildAction();
         asynchronous();
+
+//        mapListOperation();
+//        listOperation();
+        asynchronous();
     }
 
     private void closeKeyBoard() {
@@ -113,8 +116,11 @@ public class UnitTestActivityTest {
     }
 
     private void asynchronous() {
+        boolean contains = IdlingRegistry.getInstance().getResources().contains(resource);
         onView(withId(R.id.bt_action)).perform(click());
-        IdlingRegistry.getInstance().register(resource);
+        if(!contains){
+            IdlingRegistry.getInstance().register(resource);
+        }
         onView(withId(R.id.tv_test_1)).check(matches(withText("张三的歌")));
     }
 
