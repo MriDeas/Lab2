@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.SampleAdapter;
@@ -33,6 +34,8 @@ public class UnitTestActivity extends BaseActivity {
     ListView list_view;
     @BindView(R.id.tv_test_1)
     TextView tv_test_1;
+    @BindView(R.id.rv_recycler_view)
+    RecyclerView rv_recycler_view;
 
     private List<Map<String, String>> data = new ArrayList<>();
     private List<String> data2 = new ArrayList<>();

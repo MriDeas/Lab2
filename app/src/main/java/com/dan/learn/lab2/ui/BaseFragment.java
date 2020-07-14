@@ -1,7 +1,10 @@
 package com.dan.learn.lab2.ui;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -16,15 +19,19 @@ import butterknife.Unbinder;
 
 
 public abstract class BaseFragment extends Fragment {
+    protected abstract int getContentLayout();
 
     private Unbinder mBinder;
-
-    protected abstract int getContentLayout();
-//    protected abstract void initView(View rootView);
-
     private String mTitle;
+    protected Context mContext;
 
-    public BaseFragment(String title) {
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    protected BaseFragment(String title) {
         this.mTitle = title;
     }
 

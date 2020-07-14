@@ -2,6 +2,8 @@ package com.dan.learn.lab2.repository;
 
 import com.dan.learn.lab2.entity.FuncGroupEntity;
 import com.dan.learn.lab2.ui.RxJavaBasicActivity;
+import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
+import com.dan.learn.lab2.ui.activity.CamerasActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
@@ -26,6 +28,8 @@ public class MainDataSet {
                 .addChild("自定义组件", "", CustomWidgetsActivity.class);
         createChild(createGroup("多线程"), "线程Activity", "", ThreadActivity.class);
         createChild(createGroup("单元测试"), "单元测试", "Android 单元测试", UnitTestActivity.class);
+        createChild(createGroup("无障碍"), "无障碍服务", "无障碍服务实验室", AccessibilityServiceLabActivity.class);
+        createChild(createGroup("相机拍照"), "相机", "相机实验室", CamerasActivity.class);
     }
 
     public List<FuncGroupEntity> getData() {

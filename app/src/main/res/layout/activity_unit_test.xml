@@ -58,14 +58,30 @@
                 android:text="2" />
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/list_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="multipleChoice"/>
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:choiceMode="multipleChoice" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
 
     </LinearLayout>
-
 
 
 </FrameLayout>
