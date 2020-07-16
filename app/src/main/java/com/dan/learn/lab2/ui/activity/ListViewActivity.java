@@ -1,4 +1,4 @@
-package com.dan.learn.lab2;
+package com.dan.learn.lab2.ui.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.TextView;
 
+import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.DragListAdapter;
 import com.dan.learn.lab2.widget.DragAddAutoListView;
 

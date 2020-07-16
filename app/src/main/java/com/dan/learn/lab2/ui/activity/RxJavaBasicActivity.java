@@ -1,9 +1,10 @@
-package com.dan.learn.lab2.ui;
+package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import com.dan.learn.lab2.R;
+import com.dan.learn.lab2.ui.base.BaseActivity;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;

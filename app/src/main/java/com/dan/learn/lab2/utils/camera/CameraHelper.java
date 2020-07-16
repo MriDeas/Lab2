@@ -1,9 +1,11 @@
 package com.dan.learn.lab2.utils.camera;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 

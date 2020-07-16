@@ -1,13 +1,14 @@
 package com.dan.learn.lab2.repository;
 
 import com.dan.learn.lab2.entity.FuncGroupEntity;
-import com.dan.learn.lab2.ui.RxJavaBasicActivity;
+import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
+import com.dan.learn.lab2.ui.activity.ViewKnowledgeActivity;
 
 import java.util.List;
 
@@ -23,25 +24,63 @@ public class MainDataSet {
         MainPageRepository instance = MainPageRepository.getInstance();
         instance.clear();
 
-        createChild(createGroup("RxJava"), "RxJava基础", "", RxJavaBasicActivity.class);
-        createChild(createGroup("自定义控件"), "拖拽控件", "", DragViewActivity.class)
-                .addChild("自定义组件", "", CustomWidgetsActivity.class);
-        createChild(createGroup("多线程"), "线程Activity", "", ThreadActivity.class);
-        createChild(createGroup("单元测试"), "单元测试", "Android 单元测试", UnitTestActivity.class);
-        createChild(createGroup("无障碍"), "无障碍服务", "无障碍服务实验室", AccessibilityServiceLabActivity.class);
-        createChild(createGroup("相机拍照"), "相机", "相机实验室", CamerasActivity.class);
+        createDatabase();
+        createViewKnowledge();
+        createCustomView();
+        createMultiThread();
+        createRxJavaData();
+        createCamera();
+        createAccessibility();
+        createUnitTest();
+    }
+
+    private void createViewKnowledge() {
+        FuncGroupEntity view = makeGroup("View基础");
+        view.addChild("View 基础", "View 绘制，测量，布局", ViewKnowledgeActivity.class);
+    }
+
+    private void createRxJavaData() {
+        FuncGroupEntity rxJava = makeGroup("RxJava");
+        rxJava.addChild("RxJava基础", "RxJava", RxJavaBasicActivity.class);
+    }
+
+    private void createCustomView() {
+        FuncGroupEntity viewKnowledge = makeGroup("自定义控件");
+        viewKnowledge.addChild("拖拽控件", "拖拽", DragViewActivity.class);
+        viewKnowledge.addChild("自定义组件", "其他组件", CustomWidgetsActivity.class);
+    }
+
+    private void createDatabase() {
+        FuncGroupEntity database = makeGroup("数据库");
+        database.addChild("SQLite 数据库", "数据库", null);
+        database.addChild("Room 数据库", "官方支持的 Room 数据库", null);
+    }
+
+    private void createMultiThread() {
+        FuncGroupEntity multiThread = makeGroup("多线程");
+        multiThread.addChild("线程Activity", "多线程", ThreadActivity.class);
+    }
+
+    private void createUnitTest() {
+        FuncGroupEntity unitTest = makeGroup("单元测试");
+        unitTest.addChild("单元测试", "Android 单元测试", UnitTestActivity.class);
+    }
+
+    private void createAccessibility() {
+        FuncGroupEntity accessibility = makeGroup("无障碍");
+        accessibility.addChild("无障碍服务", "无障碍服务实验室", AccessibilityServiceLabActivity.class);
+    }
+
+    private void createCamera() {
+        FuncGroupEntity camera = makeGroup("相机拍照");
+        camera.addChild("相机", "相机实验室", CamerasActivity.class);
     }
 
     public List<FuncGroupEntity> getData() {
         return MainPageRepository.getInstance().getData();
     }
 
-    private FuncGroupEntity createGroup(String title) {
+    private FuncGroupEntity makeGroup(String title) {
         return MainPageRepository.getInstance().createGroup(title);
-    }
-
-    private FuncGroupEntity createChild(FuncGroupEntity parent, String title, String desc, Class clazz) {
-        parent.addChild(title, desc, clazz);
-        return parent;
     }
 }

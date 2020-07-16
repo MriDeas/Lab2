@@ -2,7 +2,6 @@ package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,8 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.SampleAdapter;
 import com.dan.learn.lab2.entity.Item;
-import com.dan.learn.lab2.repository.MainDataSet;
-import com.dan.learn.lab2.ui.BaseActivity;
+import com.dan.learn.lab2.ui.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;

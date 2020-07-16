@@ -1,7 +1,6 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dan.learn.lab2.R;
-import com.dan.learn.lab2.ui.BaseActivity;
-import com.dan.learn.lab2.widget.DragUpDownLinearLayout;
+import com.dan.learn.lab2.ui.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;

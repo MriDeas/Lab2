@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.service.DemoAccessibilityService;
-import com.dan.learn.lab2.ui.BaseActivity;
+import com.dan.learn.lab2.ui.base.BaseActivity;
 
 import butterknife.OnClick;
 

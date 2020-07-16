@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -18,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.activity.ViewKnowledgeActivity"></activity>
         <activity android:name=".ui.activity.CamerasActivity" />
         <activity android:name=".ui.activity.AccessibilityServiceLabActivity" />
         <activity android:name=".ui.activity.UnitTestActivity" />
@@ -26,10 +27,10 @@
         <activity
             android:name=".ui.activity.DragViewActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity android:name=".ui.BaseActivity" />
-        <activity android:name=".ui.RxJavaBasicActivity" />
-        <activity android:name=".ListViewActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.base.BaseActivity" />
+        <activity android:name=".ui.activity.RxJavaBasicActivity" />
+        <activity android:name=".ui.activity.ListViewActivity" />
+        <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

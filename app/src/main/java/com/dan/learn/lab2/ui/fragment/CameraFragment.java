@@ -5,12 +5,9 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -20,7 +17,7 @@ import androidx.annotation.Nullable;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.constant.AppConstant;
-import com.dan.learn.lab2.ui.BaseFragment;
+import com.dan.learn.lab2.ui.base.BaseFragment;
 import com.dan.learn.lab2.utils.FileUtil;
 import com.dan.learn.lab2.utils.PermissionUtil;
 import com.dan.learn.lab2.utils.camera.CameraHelper;

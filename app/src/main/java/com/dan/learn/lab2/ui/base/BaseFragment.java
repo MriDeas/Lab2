@@ -1,4 +1,4 @@
-package com.dan.learn.lab2.ui;
+package com.dan.learn.lab2.ui.base;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dan.learn.lab2.R;
 
@@ -43,10 +44,13 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(getContentLayout(), container, false);
-        mBinder = ButterKnife.bind(this,rootView);
+        mBinder = ButterKnife.bind(this, rootView);
         return rootView;
     }
 
+    protected void promptMsg(String prompt) {
+        Toast.makeText(mContext, prompt, Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onDestroyView() {

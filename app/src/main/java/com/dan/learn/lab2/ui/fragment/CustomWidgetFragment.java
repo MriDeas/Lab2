@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dan.learn.lab2.R;
-import com.dan.learn.lab2.ui.BaseFragment;
+import com.dan.learn.lab2.ui.base.BaseFragment;
 import com.dan.learn.lab2.widget.RoundCircleDrawable;
 
 import butterknife.BindView;

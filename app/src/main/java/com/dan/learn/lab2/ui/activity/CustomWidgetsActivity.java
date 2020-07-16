@@ -1,14 +1,13 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
-import android.widget.TextView;
 
 import androidx.viewpager.widget.ViewPager;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.FragmentsAdapter;
-import com.dan.learn.lab2.ui.BaseActivity;
-import com.dan.learn.lab2.ui.BaseFragment;
+import com.dan.learn.lab2.ui.base.BaseActivity;
+import com.dan.learn.lab2.ui.base.BaseFragment;
 import com.dan.learn.lab2.ui.fragment.CustomWidgetFragment;
 import com.dan.learn.lab2.ui.fragment.TextViewFragment;
 import com.google.android.material.tabs.TabLayout;

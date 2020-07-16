@@ -1,13 +1,14 @@
-package com.dan.learn.lab2;
+package com.dan.learn.lab2.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ExpandableListView;
 
+import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.MainFuncAdapter;
 import com.dan.learn.lab2.entity.FuncEntity;
 import com.dan.learn.lab2.repository.MainDataSet;
-import com.dan.learn.lab2.ui.BaseActivity;
+import com.dan.learn.lab2.ui.base.BaseActivity;
 
 import butterknife.BindView;
 
@@ -46,7 +47,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void navigateTo(Class clazz) {
-        Intent intent = new Intent(this, clazz);
+        if (clazz == null) {
+            promptMsg("未发现该页面");
+            return;
+        }
+        Intent intent = new Intent(mContext, clazz);
         startActivity(intent);
     }
 

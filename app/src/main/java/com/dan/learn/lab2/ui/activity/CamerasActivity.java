@@ -7,8 +7,8 @@ import androidx.viewpager.widget.ViewPager;
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.FragmentsAdapter;
 import com.dan.learn.lab2.constant.AppConstant;
-import com.dan.learn.lab2.ui.BaseActivity;
-import com.dan.learn.lab2.ui.BaseFragment;
+import com.dan.learn.lab2.ui.base.BaseActivity;
+import com.dan.learn.lab2.ui.base.BaseFragment;
 import com.dan.learn.lab2.ui.fragment.CameraFragment;
 import com.google.android.material.tabs.TabLayout;
 
