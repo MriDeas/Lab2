@@ -19,8 +19,32 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
+    <ImageView
+        android:id="@+id/iv_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fbt_take_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fbt_init"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:fadingEdge="horizontal"
+        android:focusable="true"
+        android:soundEffectsEnabled="true"
+        android:src="@drawable/ic_camera_blue_24dp"
+        app:backgroundTint="@android:color/holo_red_light"
+        app:elevation="5dp"
+        app:fabSize="auto" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fbt_init"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -37,5 +61,6 @@
         app:backgroundTint="@color/design_default_color_secondary"
         app:elevation="5dp"
         app:fabSize="auto" />
+
 
 </RelativeLayout>

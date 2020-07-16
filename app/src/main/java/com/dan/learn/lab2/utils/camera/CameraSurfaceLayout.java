@@ -3,9 +3,12 @@ package com.dan.learn.lab2.utils.camera;
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,12 +19,14 @@ import java.util.List;
  * Description:
  * Modify time:
  */
-public class CameraSurfaceLayout extends ViewGroup implements SurfaceHolder.Callback {
+public class CameraSurfaceLayout extends FrameLayout implements SurfaceHolder.Callback, View.OnTouchListener {
 
     private Camera mCamera;
     private SurfaceView surfaceView;
     private SurfaceHolder holder;
     private List<Camera.Size> mPreviewSizes;
+    private CameraHelper helper;
+    private LocalAutoFocusCallback mAutoFocusCallback;
 
     public CameraSurfaceLayout(Context context) {
         super(context, null);
@@ -29,16 +34,16 @@ public class CameraSurfaceLayout extends ViewGroup implements SurfaceHolder.Call
 
     public CameraSurfaceLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
 
-        surfaceView = new SurfaceView(context, attrs);
+    public void initSurface(CameraHelper helper) {
+        surfaceView = new SurfaceView(getContext());
+        surfaceView.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         addView(surfaceView);
         holder = surfaceView.getHolder();
         holder.addCallback(this);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-
+        this.helper = helper;
+        setOnTouchListener(this);
     }
 
     public void setCamera(Camera camera) {
@@ -48,8 +53,7 @@ public class CameraSurfaceLayout extends ViewGroup implements SurfaceHolder.Call
 
         mCamera = camera;
         if (mCamera != null) {
-            List<Camera.Size> localSize = mCamera.getParameters().getSupportedPreviewSizes();
-            mPreviewSizes = localSize;
+            mPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
             requestLayout();
             try {
                 mCamera.setPreviewDisplay(holder);
@@ -61,9 +65,17 @@ public class CameraSurfaceLayout extends ViewGroup implements SurfaceHolder.Call
         }
     }
 
+    public SurfaceHolder getHolder() {
+        return surfaceView == null ? null : surfaceView.getHolder();
+    }
+
+    public SurfaceView getSurfaceView() {
+        return surfaceView;
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        helper.openCamera(CameraSurfaceLayout.this, holder);
     }
 
     @Override
@@ -71,7 +83,13 @@ public class CameraSurfaceLayout extends ViewGroup implements SurfaceHolder.Call
         Camera.Parameters parameters = mCamera.getParameters();
         parameters.setPreviewSize(width, height);
         requestLayout();
-        mCamera.setParameters(parameters);
+        try {
+            mCamera.setParameters(parameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mCamera.autoFocus(null);
     }
 
     @Override
@@ -86,5 +104,31 @@ public class CameraSurfaceLayout extends ViewGroup implements SurfaceHolder.Call
 
         surfaceView = null;
         removeAllViews();
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            removeCallbacks(null);
+            postDelayed(() -> {
+                mCamera.autoFocus(getAutoFocusCallback());
+            }, 500);
+        }
+        return true;
+    }
+
+    private Camera.AutoFocusCallback getAutoFocusCallback() {
+        if (mAutoFocusCallback == null) {
+            mAutoFocusCallback = new LocalAutoFocusCallback();
+        }
+        return mAutoFocusCallback;
+    }
+
+    private static class LocalAutoFocusCallback implements Camera.AutoFocusCallback {
+
+        @Override
+        public void onAutoFocus(boolean success, Camera camera) {
+
+        }
     }
 }

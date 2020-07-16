@@ -49,6 +49,7 @@ public class CamerasActivity extends BaseActivity {
 
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), fragments);
         vp_cameras.setAdapter(adapter);
+        vp_cameras.setOffscreenPageLimit(3);
     }
 
 
