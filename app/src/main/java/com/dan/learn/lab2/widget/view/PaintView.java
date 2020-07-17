@@ -108,15 +108,15 @@ public class PaintView extends View {
         }
 
         paint.setDither(true);
-        paint.setHinting();
-        paint.setXfermode();
-        paint.setShader();
-        paint.setFontVariationSettings();
-        paint.setFontFeatureSettings();
-        paint.setShadowLayer();
-        paint.setMaskFilter();
-        paint.setPathEffect();
-        paint.setStartHyphenEdit();
+//        paint.setHinting();
+//        paint.setXfermode();
+//        paint.setShader();
+//        paint.setFontVariationSettings();
+//        paint.setFontFeatureSettings();
+//        paint.setShadowLayer();
+//        paint.setMaskFilter();
+//        paint.setPathEffect();
+//        paint.setStartHyphenEdit();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             paint.setWordSpacing(10);
