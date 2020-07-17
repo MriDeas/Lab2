@@ -1,5 +1,12 @@
 package com.dan.learn.lab2.ui.fragment;
 
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.ui.base.BaseFragment;
 
@@ -8,17 +15,26 @@ import com.dan.learn.lab2.ui.base.BaseFragment;
  */
 public class ViewDrawFragment extends BaseFragment {
 
-    public static ViewDrawFragment getInstance() {
-        return new ViewDrawFragment();
+    public static ViewDrawFragment getInstance(String title, @LayoutRes int layoutId) {
+        return new ViewDrawFragment(title, layoutId);
     }
 
-    private ViewDrawFragment() {
-        super("View 的绘制");
+    private ViewDrawFragment(String title, @LayoutRes int layoutId) {
+        super(title);
+        mLayoutRes = layoutId;
+    }
+
+    private int mLayoutRes;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @Override
     protected int getContentLayout() {
-        return R.layout.fragment_view_draw;
+        return mLayoutRes;
     }
 
 

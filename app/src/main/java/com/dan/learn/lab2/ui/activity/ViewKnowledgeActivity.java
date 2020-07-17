@@ -42,7 +42,7 @@ public class ViewKnowledgeActivity extends BaseActivity {
         tab_layout.setupWithViewPager(vp_views);
         vp_views.setOffscreenPageLimit(3);
         List<BaseFragment> list = new ArrayList<>();
-        list.add(ViewDrawFragment.getInstance());
+        list.add(ViewDrawFragment.getInstance("🖌画笔", R.layout.fragment_view_draw));
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), list);
         vp_views.setAdapter(adapter);
     }
