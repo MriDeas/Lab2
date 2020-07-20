@@ -1,6 +1,7 @@
 package com.dan.learn.lab2.repository;
 
 import com.dan.learn.lab2.entity.FuncGroupEntity;
+import com.dan.learn.lab2.ui.activity.AnnotationActivity;
 import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
@@ -31,6 +32,7 @@ public class MainDataSet {
         createRxJavaData();
         createCamera();
         createAccessibility();
+        createAnnotation();
         createUnitTest();
     }
 
@@ -74,6 +76,11 @@ public class MainDataSet {
     private void createCamera() {
         FuncGroupEntity camera = makeGroup("相机拍照");
         camera.addChild("相机", "相机实验室", CamerasActivity.class);
+    }
+
+    private void createAnnotation() {
+        FuncGroupEntity annotation = makeGroup("注解");
+        annotation.addChild("注解", "define and use annotation", AnnotationActivity.class);
     }
 
     public List<FuncGroupEntity> getData() {
