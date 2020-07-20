@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -32,6 +32,10 @@ public class PaintView extends View {
     private int height;
     private int centerX;
     private int centerY;
+    private Path linePath1;
+    private Path linePath2;
+    private Path linePath3;
+    private Path linePath4;
 
     public PaintView(Context context) {
         super(context);
@@ -51,7 +55,6 @@ public class PaintView extends View {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             setText();
         }
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -79,7 +82,7 @@ public class PaintView extends View {
     }
 
 
-    public void setPaintFlag(){
+    public void setPaintFlag() {
         // STRIKE_THRU_TEXT_FLAG 相当于加了删除线，文字中间部位加的线
         // LINEAR_TEXT_FLAG
         // SUBPIXEL_TEXT_FLAG
@@ -98,11 +101,11 @@ public class PaintView extends View {
     public void setPaintStroke() {
         paint.setStrokeWidth(20);
         paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStrokeJoin(Paint.Join.BEVEL);
-        paint.setStrokeMiter(1);
+//        paint.setStrokeJoin(Paint.Join.BEVEL);
+//        paint.setStrokeMiter(1);
     }
 
-    public void setPaintOther(){
+    public void setPaintOther() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             paint.setBlendMode(BlendMode.DIFFERENCE);
         }
@@ -136,7 +139,8 @@ public class PaintView extends View {
     protected void dispatchDraw(Canvas canvas) {
         String text = "绘制 dispatchDraw 函数 super 前";
         String text2 = "绘制 dispatchDraw 函数 super 后";
-
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(20);
         int textW = (int) paint.measureText(text);
         int textW2 = (int) paint.measureText(text2);
 
@@ -150,14 +154,13 @@ public class PaintView extends View {
     @Override
     public void onDrawForeground(Canvas canvas) {
         super.onDrawForeground(canvas);
-
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(20);
         String text = "Foreground 绘制";
         int textW = (int) paint.measureText(text);
-        paint.setColor(Color.argb(120, 255, 69, 0));
+        paint.setColor(Color.argb(100, 255, 69, 0));
         canvas.drawARGB(60, 10, 191, 255);
         canvas.drawText(text, centerX - (textW >> 1), centerY, paint);
-
-
     }
 
     @Override
@@ -166,6 +169,93 @@ public class PaintView extends View {
         paint.setColor(Color.RED);
 //        paint.setStyle(Paint.Style.FILL);
         canvas.drawCircle(centerX, centerY - 200, 100, paint);
+        drawStrokeLine(canvas);
     }
 
+
+    private void drawStrokeLine(Canvas canvas) {
+        paint.setStrokeWidth(20);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        canvas.drawLine(centerX >> 2, 100, centerX - 100, 100, paint);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(centerX >> 2, 150, centerX - 100, 150, paint);
+        paint.setStrokeCap(Paint.Cap.SQUARE);
+        canvas.drawLine(centerX >> 2, 200, centerX - 100, 200, paint);
+
+        paint.setTextSize(25);
+        String text1 = "Butt 即定义的尺寸";
+        String text2 = "ROUND 添加Round头";
+        String text3 = "SQUARE 添加方形头";
+        canvas.drawText(text1, centerX - 80, 100, paint);
+        canvas.drawText(text2, centerX - 80, 150, paint);
+        canvas.drawText(text3, centerX - 80, 200, paint);
+
+
+        drawJoinStrokeLine(canvas);
+    }
+
+    private void drawJoinStrokeLine(Canvas canvas) {
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(15);
+        paint.setColor(Color.GRAY);
+        initLinePath(0);
+        canvas.drawPath(linePath4, paint);
+        initLinePath(1);
+        canvas.drawPath(linePath1, paint);
+        initLinePath(2);
+        canvas.drawPath(linePath2, paint);
+        initLinePath(3);
+        canvas.drawPath(linePath3, paint);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(18);
+        paint.setColor(Color.BLUE);
+        paint.setStrokeWidth(2);
+
+        canvas.drawText("Join null", centerX + 100, 390, paint);
+        canvas.drawText("Join Round 圆角", centerX >> 2, 260, paint);
+        canvas.drawText("Join BEVEL 直线", centerX + 100, 260, paint);
+        canvas.drawText("Join MITER 锐角", (centerX >> 2)+ 100, 380, paint);
+    }
+
+    private void initLinePath(int pathIndex) {
+        if (linePath1 == null) {
+            linePath1 = new Path();
+            linePath2 = new Path();
+            linePath3 = new Path();
+            linePath4 = new Path();
+        }
+
+        if (pathIndex == 0) {
+            linePath4.moveTo(centerX, 350);
+            linePath4.lineTo(centerX + 300, 350);
+            linePath4.lineTo(centerX + 300, 500);
+            linePath4.close();
+        }
+
+        if (pathIndex == 1) {
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            linePath1.moveTo(centerX >> 2, 240);
+            linePath1.lineTo(centerX - 100, 240);
+            linePath1.lineTo(centerX - 100, 320);
+            linePath1.close();
+        }
+
+        if (pathIndex == 2) {
+            paint.setStrokeJoin(Paint.Join.BEVEL);
+            linePath2.moveTo(centerX, 240);
+            linePath2.lineTo(centerX + 300, 240);
+            linePath2.lineTo(centerX + 300, 330);
+            linePath2.close();
+        }
+
+        if (pathIndex == 3) {
+            paint.setStrokeJoin(Paint.Join.MITER);
+            linePath3.moveTo(centerX >> 2, 350);
+            linePath3.lineTo(centerX - 100, 350);
+            linePath3.lineTo(centerX - 100, 500);
+            linePath3.close();
+        }
+
+    }
 }

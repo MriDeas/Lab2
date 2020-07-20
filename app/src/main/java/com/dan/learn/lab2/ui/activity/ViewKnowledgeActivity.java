@@ -46,4 +46,7 @@ public class ViewKnowledgeActivity extends BaseActivity {
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), list);
         vp_views.setAdapter(adapter);
     }
+
+
+
 }
