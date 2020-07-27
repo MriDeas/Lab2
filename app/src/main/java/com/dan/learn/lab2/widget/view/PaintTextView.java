@@ -46,6 +46,7 @@ public class PaintTextView extends View {
         drawBoldAndSkew(canvas);
         drawTextWithLetterSpacing(canvas);
         drawElegantTextHeight(canvas);
+        drawDeleteAndScaleText(canvas);
     }
 
     private void drawText(Canvas canvas) {
@@ -118,15 +119,20 @@ public class PaintTextView extends View {
 
     private void drawElegantTextHeight(Canvas canvas) {
         reset();
-        String text = "setElegantTextHeight(true) Set the paint's elegant height metrics flag. " +
-                "\n This setting selects font variants that have " +
-                "\n not been compacted to fit Latin-based vertical" +
-                "\n metrics, and also increases top and" +
-                "\n bottom bounds to provide more space";
+        String text = "setElegantTextHeight(true) ";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             paint.setElegantTextHeight(true);
         }
 
+        canvas.drawText(text, 10, heightSum, paint);
+        measureTextHeight(text);
+    }
+
+    private void drawDeleteAndScaleText(Canvas canvas) {
+        reset();
+        String text = "删除线setStrikeThruText & setScaleX";
+        paint.setStrikeThruText(true);
+        paint.setTextScaleX(1.25f);
         canvas.drawText(text, 10, heightSum, paint);
         measureTextHeight(text);
     }
