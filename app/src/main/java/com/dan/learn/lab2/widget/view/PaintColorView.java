@@ -1,15 +1,19 @@
 package com.dan.learn.lab2.widget.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.LightingColorFilter;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import com.dan.learn.lab2.R;
 
 /**
  * Created by: dan
@@ -19,12 +23,21 @@ import androidx.annotation.Nullable;
  */
 public class PaintColorView extends View {
 
+    private static final int FILTER_MODE_LIGHT = 1;
+    private static final int FILTER_PORTER_DUFF = 2;
+    private static final int FILTER_COLOR_MATRIX = 3;
+
     private Paint mPaint;
-    private ColorMatrixColorFilter matrixFilter;
-    private LightingColorFilter lightingColorFilter;
+
+    private RectF rectF = new RectF();
+
+    private int colorMul;
+    private int colorAdd;
+    private int filterMode = 1;
+    private Bitmap bitmap;
 
     public PaintColorView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public PaintColorView(Context context, @Nullable AttributeSet attrs) {
@@ -34,35 +47,49 @@ public class PaintColorView extends View {
     {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-//        matrixFilter = new ColorMatrixColorFilter(new float[]{0.5f, 0.35f});
+        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawRoundRect(canvas);
+        if (filterMode == FILTER_MODE_LIGHT) {
+            drawLightColorFilterRect(canvas);
+            drawLightColorFilterBitmap(canvas);
+        }
     }
 
     private void drawRoundRect(Canvas canvas) {
-        mPaint.setColor(Color.RED);
-        mPaint.setAlpha(100);
         mPaint.setARGB(100, 99, 100, 102);
-        canvas.drawRect(100, 100, 200, 300, mPaint);
+        canvas.drawRect(10, 10, 200, 300, mPaint);
     }
 
-    private void drawLinearColorFilter(Canvas canvas) {
-        mPaint.setColorFilter(matrixFilter);
-    }
-
-    private void drawColorFilterMatrix(Canvas canvas) {
-        setLightingFilter();
-        mPaint.setColor(Color.rgb(30, 60, 120));
-    }
-
-    private void setLightingFilter() {
-        if (lightingColorFilter == null) {
-            lightingColorFilter = new LightingColorFilter(0xFFFF0FFF, 0x000000FF);
-            mPaint.setColorFilter(lightingColorFilter);
+    public void setLightColorFilter(ColorFilter filter) {
+        filterMode = FILTER_MODE_LIGHT;
+        if (mPaint != null) {
+            mPaint.setColorFilter(filter);
         }
+        invalidate();
     }
+
+    public void setLightColorFilterValue(int mul, int add) {
+        colorAdd = add;
+        colorMul = mul;
+        invalidate();
+    }
+
+    private void drawLightColorFilterRect(Canvas canvas) {
+        rectF.set(230, 10, 360, 300);
+        canvas.drawRect(rectF, mPaint);
+        mPaint.setColor(Color.parseColor("#326b6b"));
+        String text = "mul :" + colorMul + " add:" + colorAdd;
+        canvas.drawText(text, 200, 310, mPaint);
+    }
+
+    private void drawLightColorFilterBitmap(Canvas canvas) {
+        canvas.drawBitmap(bitmap, 380, 10, mPaint);
+    }
+
 }
