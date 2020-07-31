@@ -10,6 +10,7 @@ import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
 import com.dan.learn.lab2.ui.activity.ViewKnowledgeActivity;
+import com.dan.learn.lab2.ui.activity.ViewPathActivity;
 
 import java.util.List;
 
@@ -38,7 +39,8 @@ public class MainDataSet {
 
     private void createViewKnowledge() {
         FuncGroupEntity view = makeGroup("View基础");
-        view.addChild("View 基础", "View 绘制，测量，布局", ViewKnowledgeActivity.class);
+        view.addChild("View 基础 Paint", "View 画笔", ViewKnowledgeActivity.class);
+        view.addChild("View 基础 Path", "View Path", ViewPathActivity.class);
     }
 
     private void createRxJavaData() {

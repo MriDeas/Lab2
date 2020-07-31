@@ -18,7 +18,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.AnnotationActivity"></activity>
+        <activity android:name=".ui.base.BaseMultiFragmentActivity"></activity>
+        <activity android:name=".ui.activity.ViewPathActivity" />
+        <activity android:name=".ui.activity.AnnotationActivity" />
         <activity android:name=".ui.activity.ViewKnowledgeActivity" />
         <activity android:name=".ui.activity.CamerasActivity" />
         <activity android:name=".ui.activity.AccessibilityServiceLabActivity" />
