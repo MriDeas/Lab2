@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -21,12 +22,81 @@
             android:id="@+id/switch_light_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="light Color filter "/>
+            android:text="light Color filter " />
 
         <com.dan.learn.lab2.widget.view.PaintColorView
             android:id="@+id/pcv_color_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="130dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="PorterDuffColorFilter"
+            android:textColor="#ffffff" />
+
+        <Switch
+            android:id="@+id/switch_porter_duff_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Porter Duff ColorFilter " />
+
+        <Button
+            android:id="@+id/bt_change_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="切换模式" />
+
+        <com.dan.learn.lab2.widget.view.PaintColorView
+            android:id="@+id/pcv_color_view_2"
+            android:layout_width="match_parent"
+            android:layout_height="130dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="ColorMatrixFilter"
+            android:textColor="#ffffff" />
+
+        <SeekBar
+            android:id="@+id/seek_red"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:max="255"
+            android:progress="0" />
+
+        <SeekBar
+            android:id="@+id/seek_green"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/holo_green_light"
+            android:max="255"
+            android:progress="0" />
+
+        <SeekBar
+            android:id="@+id/seek_blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/holo_blue_light"
+            android:max="255"
+            android:progress="0" />
+        <SeekBar
+            android:id="@+id/seek_alpha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:max="255"
+            android:progress="0" />
+
+
+        <com.dan.learn.lab2.widget.view.PaintColorView
+            android:id="@+id/pcv_color_view_3"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
