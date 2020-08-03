@@ -1,17 +1,13 @@
 package com.dan.learn.lab2.ui.fragment;
 
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
@@ -174,11 +170,11 @@ public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarC
                 break;
             case R.id.seek_alpha:
                 colorAlpha = progress;
-                matrixColorArray[15] = colorAlpha;
-                matrixColorArray[16] = colorAlpha;
-                matrixColorArray[17] = colorAlpha;
-                matrixColorArray[18] = colorAlpha;
-                matrixColorArray[19] = offset;
+                matrixColorArray[15] = 100;
+                matrixColorArray[16] = 100;
+                matrixColorArray[17] = 100;
+                matrixColorArray[18] = 100;
+                matrixColorArray[19] = 100;
                 break;
         }
 
