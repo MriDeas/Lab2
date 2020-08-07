@@ -1,6 +1,9 @@
 package com.dan.learn.lab2.repository;
 
+import android.util.Log;
+
 import com.dan.learn.lab2.entity.FuncGroupEntity;
+import com.dan.learn.lab2.test.TestProguardClass;
 import com.dan.learn.lab2.ui.activity.AnnotationActivity;
 import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
@@ -35,6 +38,10 @@ public class MainDataSet {
         createAccessibility();
         createAnnotation();
         createUnitTest();
+
+        TestProguardClass testProguardClass = new TestProguardClass();
+        String name = testProguardClass.getName();
+        Log.d(MainDataSet.class.getCanonicalName(), name);
     }
 
     private void createViewKnowledge() {
