@@ -39,9 +39,9 @@ public class MainDataSet {
         createAnnotation();
         createUnitTest();
 
-        TestProguardClass testProguardClass = new TestProguardClass();
-        String name = testProguardClass.getName();
-        Log.d(MainDataSet.class.getCanonicalName(), name);
+//        TestProguardClass testProguardClass = new TestProguardClass();
+//        String name = testProguardClass.getName();
+//        Log.d(MainDataSet.class.getCanonicalName(), name);
     }
 
     private void createViewKnowledge() {

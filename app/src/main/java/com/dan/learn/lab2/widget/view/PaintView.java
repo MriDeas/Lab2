@@ -40,7 +40,6 @@ public class PaintView extends View {
         paint.setStrokeWidth(SizeUtil.dp2px(5));
         paint.setTextSize(30);
         paint.setAntiAlias(true);
-
     }
 
 
