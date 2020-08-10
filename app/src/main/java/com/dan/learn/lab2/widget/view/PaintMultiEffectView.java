@@ -59,28 +59,21 @@ public class PaintMultiEffectView extends View {
     }
 
     private void drawMaskFilter1(Canvas canvas) {
+        setLayerType(View.LAYER_TYPE_SOFTWARE,null);
         canvas.drawColor(Color.DKGRAY);
-        float left = 50;
-        float right = 150;
-        float offset = 50;
         mPaint.setMaskFilter(innerMaskFilter);
-//        canvas.drawRect(50, 50, 150, 150, mPaint);
+        mPaint.setColor(Color.BLUE);
+        canvas.drawRect(50, 50, 150, 150, mPaint);
 
-//        left = right + offset;
-//        right += 100;
-        canvas.drawColor(Color.RED);
+        mPaint.setColor(Color.RED);
         mPaint.setMaskFilter(normalMaskFilter);
         canvas.drawRect(200, 50, 300, 150, mPaint);
-//
-//        left = right + offset;
-//        right += 100;
-        canvas.drawColor(Color.YELLOW);
+
+        mPaint.setColor(Color.YELLOW);
         mPaint.setMaskFilter(outerMaskFilter);
         canvas.drawRect(350, 50, 450, 150, mPaint);
-//
-//        left = right + offset;
-//        right += 100;
-        canvas.drawColor(Color.GRAY);
+
+        mPaint.setColor(Color.CYAN);
         mPaint.setMaskFilter(solidMaskFilter);
         canvas.drawRect(500, 50, 600, 150, mPaint);
 
