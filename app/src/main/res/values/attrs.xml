@@ -4,6 +4,16 @@
         <attr name="animIn" format="reference" />
         <attr name="animOut" format="reference" />
         <attr name="interval" format="integer" />
-        <attr name="autoStart" format="boolean"/>
+        <attr name="autoStart" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="PaintMultiEffectView">
+        <attr name="mode" format="enum">
+            <enum name="shadow_layer" value="1" />
+            <enum name="shader" value="2" />
+            <enum name="x_fer_mode" value="3" />
+            <enum name="blend_mode" value="4" />
+            <enum name="mask_filter" value="5" />
+        </attr>
     </declare-styleable>
 </resources>

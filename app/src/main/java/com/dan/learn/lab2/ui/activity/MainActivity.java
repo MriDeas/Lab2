@@ -2,6 +2,7 @@ package com.dan.learn.lab2.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ExpandableListView;
 
 import com.dan.learn.lab2.R;
@@ -43,6 +44,13 @@ public class MainActivity extends BaseActivity {
             FuncEntity child = mAdapter.getChild(groupPosition, childPosition);
             navigateTo(child.getTarget());
             return true;
+        });
+        elv_expand_list.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+
+                return false;
+            }
         });
     }
 
