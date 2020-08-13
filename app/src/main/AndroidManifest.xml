@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.base.BaseMultiFragmentActivity"></activity>
+        <activity android:name=".ui.base.BaseMultiFragmentActivity" />
         <activity android:name=".ui.activity.ViewPathActivity" />
         <activity android:name=".ui.activity.AnnotationActivity" />
         <activity android:name=".ui.activity.ViewKnowledgeActivity" />
@@ -33,7 +33,9 @@
         <activity android:name=".ui.base.BaseActivity" />
         <activity android:name=".ui.activity.RxJavaBasicActivity" />
         <activity android:name=".ui.activity.ListViewActivity" />
-        <activity android:name=".ui.activity.MainActivity">
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:theme="@style/WelcomeTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
