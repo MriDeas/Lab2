@@ -16,4 +16,12 @@
             <enum name="mask_filter" value="5" />
         </attr>
     </declare-styleable>
+
+    <attr name="custom_button_bg" format="color|reference" />
+    <attr name="custom_button_text_color" format="color|reference" />
+    <attr name="custom_text_color" format="color|reference" />
+    <attr name="custom_editor_bg" format="color|reference" />
+    <attr name="custom_editor_text_color" format="color|reference" />
+    <attr name="custom_background_bg" format="color|reference"/>
+
 </resources>

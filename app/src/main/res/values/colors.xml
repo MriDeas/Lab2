@@ -3,4 +3,18 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="bt_light_color">#a4c2f4</color>
+    <color name="bt_night_color">#3c78d8</color>
+    <color name="bt_light_text_color">#ffffff</color>
+    <color name="bt_night_text_color">#eae0e0</color>
+    <color name="editor_light_bg">#ffffff</color>
+    <color name="editor_night_bg">#cfe2f3</color>
+    <color name="editor_night_text_color">#161b20</color>
+    <color name="editor_light_text_color">#000000</color>
+    <color name="tv_night_color">#000000</color>
+    <color name="tv_light_color">#073763</color>
+    <color name="bg_night_color">#7bb2e5</color>
+    <color name="bg_light_color">#ffffff</color>
+
 </resources>

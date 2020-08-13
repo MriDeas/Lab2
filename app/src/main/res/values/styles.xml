@@ -12,4 +12,41 @@
         <item name="android:windowBackground">@drawable/bac_app_theme</item>
     </style>
 
+
+    <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    </style>
+
+    <style name="NightTheme" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
+
+    </style>
+
+    <style name="CusEditor">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="CustomWidgetStyle" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="DayNightStyle" parent="CustomWidgetStyle">
+        <item name="custom_button_bg">@color/bt_night_color</item>
+        <item name="custom_editor_text_color">@color/editor_night_text_color</item>
+        <item name="custom_button_text_color">@color/bt_night_text_color</item>
+        <item name="custom_editor_bg">@color/editor_night_bg</item>
+        <item name="custom_text_color">@color/tv_night_color</item>
+        <item name="custom_background_bg">@color/bg_night_color</item>
+    </style>
+
+    <style name="DayLightStyle" parent="CustomWidgetStyle">
+        <item name="custom_button_bg">@color/bt_light_color</item>
+        <item name="custom_editor_text_color">@color/editor_light_text_color</item>
+        <item name="custom_button_text_color">@color/bt_light_text_color</item>
+        <item name="custom_editor_bg">@color/editor_light_bg</item>
+        <item name="custom_text_color">@color/tv_light_color</item>
+        <item name="custom_background_bg">@color/bg_light_color</item>
+    </style>
+
 </resources>

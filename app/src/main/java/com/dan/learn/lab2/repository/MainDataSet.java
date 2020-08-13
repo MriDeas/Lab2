@@ -1,15 +1,13 @@
 package com.dan.learn.lab2.repository;
 
-import android.util.Log;
-
 import com.dan.learn.lab2.entity.FuncGroupEntity;
-import com.dan.learn.lab2.test.TestProguardClass;
-import com.dan.learn.lab2.ui.activity.AnnotationActivity;
-import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
+import com.dan.learn.lab2.ui.activity.AnnotationActivity;
+import com.dan.learn.lab2.ui.activity.AppCustomThemeActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
+import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
 import com.dan.learn.lab2.ui.activity.ViewKnowledgeActivity;
@@ -38,10 +36,7 @@ public class MainDataSet {
         createAccessibility();
         createAnnotation();
         createUnitTest();
-
-//        TestProguardClass testProguardClass = new TestProguardClass();
-//        String name = testProguardClass.getName();
-//        Log.d(MainDataSet.class.getCanonicalName(), name);
+        createAppTheme();
     }
 
     private void createViewKnowledge() {
@@ -90,6 +85,11 @@ public class MainDataSet {
     private void createAnnotation() {
         FuncGroupEntity annotation = makeGroup("注解");
         annotation.addChild("注解", "define and use annotation", AnnotationActivity.class);
+    }
+
+    private void createAppTheme() {
+        FuncGroupEntity view = makeGroup("主题");
+        view.addChild("自定义主题", "定义我的主题", AppCustomThemeActivity.class);
     }
 
     public List<FuncGroupEntity> getData() {

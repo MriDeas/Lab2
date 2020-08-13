@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/custom_background_bg"
+    android:orientation="vertical"
+    tools:context=".ui.activity.AppCustomThemeActivity">
+
+    <Button
+        android:id="@+id/bt_day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/custom_button_bg"
+        android:onClick="switchDay"
+        android:text="日光"
+        android:textColor="?attr/custom_button_text_color" />
+
+    <Button
+        android:id="@+id/bt_night"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/custom_button_bg"
+        android:onClick="switchNight"
+        android:text="暗夜"
+        android:textColor="?attr/custom_button_text_color" />
+
+    <Button
+        android:id="@+id/bt_follow_system"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/custom_button_bg"
+        android:text="跟随系统"
+        android:textColor="?attr/custom_button_text_color" />
+
+    <TextView
+        android:id="@+id/tv_text_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:padding="5dp"
+        android:text="现在你会看到一个对话框，里面可以为样式设置名字，还可以选择要包含的属性。我们命名为MyBox，并选择除了background之外的所有属性"
+        android:textColor="?attr/custom_text_color" />
+
+    <EditText
+        android:id="@+id/et_text"
+        style="@style/CusEditor"
+        android:background="?attr/custom_editor_bg"
+        android:hint="@string/app_name"
+        android:textColor="?attr/custom_editor_text_color" />
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:progress="30" />
+
+    <CheckBox
+        android:id="@+id/cb_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="checkBox" />
+
+    <Switch
+        android:id="@+id/switch_bt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true" />
+
+</LinearLayout>
