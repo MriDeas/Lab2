@@ -31,6 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/custom_button_bg"
+        android:onClick="followSystem"
         android:text="跟随系统"
         android:textColor="?attr/custom_button_text_color" />
 

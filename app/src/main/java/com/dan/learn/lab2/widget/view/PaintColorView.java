@@ -77,13 +77,15 @@ public class PaintColorView extends View {
     {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
+        }
         if (filterMode == FILTER_MODE_LIGHT) {
             drawRoundRect(canvas);
             drawLightColorFilterRect(canvas);

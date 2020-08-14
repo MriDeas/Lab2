@@ -2,6 +2,7 @@ package com.dan.learn.lab2.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 
 import com.dan.learn.lab2.R;
@@ -11,30 +12,36 @@ import com.dan.learn.lab2.R;
  */
 public class AppCustomThemeActivity extends Activity {
 
-    private static boolean night = false;
+    private static int night = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (night) {
+        if (night == 0) {
             setTheme(R.style.DayNightStyle);
-        } else {
+        } else if (night == 1) {
             setTheme(R.style.DayLightStyle);
+        } else {
+            setTheme(R.style.Theme_MaterialComponents_DayNight);
         }
+
         setContentView(R.layout.activity_app_custom_theme);
     }
 
     public void switchDay(View v) {
-        night = false;
+        night = 1;
         recreate();
     }
 
     public void switchNight(View v) {
-        night = true;
+        night = 0;
         recreate();
     }
 
-
+    public void followSystem(View v) {
+        night = 2;
+        recreate();
+    }
 
 
 }
