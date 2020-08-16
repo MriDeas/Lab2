@@ -8,6 +8,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dan.learn.lab2.R;
+import com.dan.learn.lab2.utils.BuildTypeUtil;
 import com.google.android.material.snackbar.Snackbar;
 
 import butterknife.ButterKnife;
@@ -25,10 +26,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mContext = this;
         setContentView(getContentLayout());
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.bac_solid_action_bar));
-        }
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.bac_solid_action_bar));
+//        }
+        BuildTypeUtil.settingActionStyle(this);
         mBinder = ButterKnife.bind(this);
     }
 
