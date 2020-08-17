@@ -3,13 +3,13 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-            storeFile file('/Users/dan/Desktop/App/lab2.jks')
+            storeFile file('src/lab2.jks')
             storePassword '123456'
             keyAlias 'lab2'
             keyPassword '123456'
         }
         debug {
-            storeFile file('/Users/dan/Desktop/App/lab2.jks')
+            storeFile file('src/lab2.jks')
             storePassword '123456'
             keyAlias 'lab2'
             keyPassword '123456'
@@ -38,6 +38,26 @@ android {
             minifyEnabled false
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        internal {
+            initWith debug
+            minifyEnabled true
+        }
+    }
+
+    flavorDimensions 'price','nation'
+    productFlavors{
+        free{
+            dimension 'price'
+        }
+        paid{
+            dimension 'price'
+        }
+        china{
+            dimension('nation')
+        }
+        global{
+            dimension('nation')
         }
     }
 
