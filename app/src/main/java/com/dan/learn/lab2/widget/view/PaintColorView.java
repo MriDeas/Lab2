@@ -100,24 +100,24 @@ public class PaintColorView extends View {
     private void drawPorterDuffColorFilter(Canvas canvas) {
         mPaint.setTextSize(20);
 
-        mPaint.setColorFilter(null);
-        canvas.drawBitmap(bitmap, 10, 20, mPaint);
-        mPaint.setColorFilter(porterDuffColorFilter);
-        canvas.drawBitmap(bitmap, 100, 20, mPaint);
-
-        canvas.drawBitmap(bitmap, 220, 20, mPaint);
-        canvas.drawBitmap(bitmap, 290, 20, mPaint);
-
-        rectF.set(400, 20, 500, 120);
+//        rectF.set(400, 20, 500, 120);
         rectF2.set(460, 60, 560, 160);
-
-        mPaint.setColor(Color.RED);
-        canvas.drawRect(rectF, mPaint);
-        mPaint.setColor(Color.GREEN);
+//        int count = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
+        canvas.drawBitmap(bitmap,400,20,mPaint);
+//        canvas.drawRect(rectF, mPaint);
+        mPaint.setColorFilter(porterDuffColorFilter);
         canvas.drawRect(rectF2, mPaint);
 
         mPaint.setColorFilter(null);
-        mPaint.setColor(Color.CYAN);
+//        canvas.restoreToCount(count);
+
+
+
+//        mPaint.setColor(Color.RED);
+//        canvas.drawRect(rectF, mPaint);
+//        mPaint.setColor(Color.GREEN);
+//        canvas.drawRect(rectF2, mPaint);
+        mPaint.setTextSize(20);
         canvas.drawText(modeStr[porterDuffColorFilterIndex], 10, 20, mPaint);
     }
 

@@ -46,6 +46,7 @@ public class PaintTextView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        reset();
         drawUnderLine(canvas);
         drawTypeFace(canvas);
         drawBoldAndSkew(canvas);
@@ -54,13 +55,16 @@ public class PaintTextView extends View {
         drawDeleteAndScaleText(canvas);
         drawTextWithFlag(canvas);
         textLineHeight = heightSum;
+        Paint.Align textAlign = paint.getTextAlign();
+        String alignName = textAlign != null ? textAlign.name() : "align null";
+
+        canvas.drawText(alignName,100,textLineHeight + 100,paint);
+        textLineHeight = heightSum + 300;
         drawTextAlign(canvas);
     }
 
     private void drawTextWithFlag(Canvas canvas) {
-
         reset();
-//        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.GRAY);
         int h = heightSum + 30;
         heightSum = h;
@@ -199,11 +203,12 @@ public class PaintTextView extends View {
     }
 
     private void reset() {
+        paint.setTextSize(25);
         paint.setTextSkewX(0);
         paint.setUnderlineText(false);
         paint.setFakeBoldText(false);
         paint.setStrikeThruText(false);
-
+        paint.setTextAlign(Paint.Align.LEFT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             paint.setLetterSpacing(0);
         }

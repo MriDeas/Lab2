@@ -39,6 +39,7 @@ public class PaintMultiEffectView extends View {
             PorterDuff.Mode.OVERLAY, PorterDuff.Mode.SCREEN, PorterDuff.Mode.SRC,
             PorterDuff.Mode.SRC_ATOP, PorterDuff.Mode.SRC_IN, PorterDuff.Mode.SRC_OVER,
             PorterDuff.Mode.XOR};
+
     private String[] X_FER_MODE_STR_ARR = new String[]{
             "ADD", "DARKEN", "DST", "DST_ATOP",
             "DST_IN", "DST_OUT", "DST_OVER",
@@ -72,7 +73,9 @@ public class PaintMultiEffectView extends View {
     private BitmapShader bitmapShader1;
     private BitmapShader bitmapShader2;
     private BitmapShader bitmapShader3;
+
     private Xfermode xfermode;
+    private Xfermode currMode;
     private int XFER_MODE_INDEX = 0;
     private String xferModeStr;
 
@@ -91,19 +94,19 @@ public class PaintMultiEffectView extends View {
         mode = a.getInteger(R.styleable.PaintMultiEffectView_mode, MODE_MASK_FILTER);
         a.recycle();
 
-        if (mode == MODE_X_FER_MODE) {
-            xferModeStr = X_FER_MODE_STR_ARR[XFER_MODE_INDEX];
-            xfermode = new PorterDuffXfermode(X_FER_MODES[XFER_MODE_INDEX]);
-            setOnClickListener(v -> {
-                if (XFER_MODE_INDEX >= X_FER_MODES.length) {
-                    XFER_MODE_INDEX = 0;
-                }
-                xfermode = new PorterDuffXfermode(X_FER_MODES[XFER_MODE_INDEX]);
-                xferModeStr = X_FER_MODE_STR_ARR[XFER_MODE_INDEX];
-                invalidate();
-                XFER_MODE_INDEX++;
-            });
-        }
+//        if (mode == MODE_X_FER_MODE) {
+//            xferModeStr = X_FER_MODE_STR_ARR[XFER_MODE_INDEX];
+//            xfermode = new PorterDuffXfermode(X_FER_MODES[XFER_MODE_INDEX]);
+//            setOnClickListener(v -> {
+//                if (XFER_MODE_INDEX >= X_FER_MODES.length) {
+//                    XFER_MODE_INDEX = 0;
+//                }
+//                xfermode = new PorterDuffXfermode(X_FER_MODES[XFER_MODE_INDEX]);
+//                xferModeStr = X_FER_MODE_STR_ARR[XFER_MODE_INDEX];
+//                invalidate();
+//                XFER_MODE_INDEX++;
+//            });
+//        }
     }
 
     {
@@ -184,24 +187,33 @@ public class PaintMultiEffectView extends View {
         mPaint.setXfermode(null);
     }
 
+    public void setXFerPorterDuffMode(Xfermode mode) {
+        currMode = mode;
+        invalidate();
+    }
+
     private void drawXferMode(Canvas canvas) {
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-//        canvas.saveLayer()
+        int saveCount = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
 
-//        mPaint.setColor(Color.MAGENTA);
-//        canvas.drawCircle(100,100,50,mPaint);
-        canvas.drawBitmap(bitmap,10,10,mPaint);
+        mPaint.setColor(Color.MAGENTA);
+        canvas.drawRect(200, 100, 300, 200, mPaint);
 
-//        mPaint.setColor(Color.BLUE);
-        mPaint.setXfermode(xfermode);
-        canvas.drawBitmap(bitmap, 60, 30, mPaint);
-//        canvas.drawRect(100,100,250,250,mPaint);
+        mPaint.setXfermode(currMode);
 
+        mPaint.setColor(Color.BLUE);
+        canvas.drawCircle(300, 200, 50, mPaint);
         mPaint.setXfermode(null);
-        mPaint.setColor(Color.BLACK);
+        canvas.restoreToCount(saveCount);
+
+        mPaint.setColor(Color.RED);
         mPaint.setTextSize(20);
-        canvas.drawText(xferModeStr, 5, 100, mPaint);
+//        canvas.drawText(xferModeStr, 5, 100, mPaint);
         canvas.drawText("点击切换模式", 5, 150, mPaint);
+
+        mPaint.setColor(Color.MAGENTA);
+        canvas.drawText("矩形 :SRC", 500, 100, mPaint);
+        mPaint.setColor(Color.BLUE);
+        canvas.drawText("圆形 :DST", 500, 200, mPaint);
     }
 
     private void drawBlendMode(Canvas canvas) {

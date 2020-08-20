@@ -5,9 +5,12 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
@@ -16,13 +19,35 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dan.learn.lab2.R;
+import com.dan.learn.lab2.adapter.PorterDuffModeAdapter;
+import com.dan.learn.lab2.entity.PorterDuffEntity;
 import com.dan.learn.lab2.ui.base.BaseFragment;
 import com.dan.learn.lab2.widget.view.PaintColorView;
+import com.dan.learn.lab2.widget.view.PaintMultiEffectView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 绘制
  */
 public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarChangeListener {
+
+    private PorterDuff.Mode[] X_FER_MODES = new PorterDuff.Mode[]{
+            PorterDuff.Mode.ADD, PorterDuff.Mode.DARKEN, PorterDuff.Mode.DST,
+            PorterDuff.Mode.DST_ATOP, PorterDuff.Mode.DST_IN, PorterDuff.Mode.DST_OUT,
+            PorterDuff.Mode.DST_OVER, PorterDuff.Mode.LIGHTEN, PorterDuff.Mode.MULTIPLY,
+            PorterDuff.Mode.OVERLAY, PorterDuff.Mode.SCREEN, PorterDuff.Mode.SRC,
+            PorterDuff.Mode.SRC_ATOP, PorterDuff.Mode.SRC_IN, PorterDuff.Mode.SRC_OVER,
+            PorterDuff.Mode.XOR};
+
+    private String[] X_FER_MODE_STR_ARR = new String[]{
+            "ADD", "DARKEN", "DST", "DST_ATOP",
+            "DST_IN", "DST_OUT", "DST_OVER",
+            "LIGHTEN", "MULTIPLY", "OVERLAY",
+            "SCREEN", "SRC", "SRC_ATOP",
+            "SRC_IN", "SRC_OVER", "XOR"};
+
 
     private PaintColorView pcv_color_view;
     private PaintColorView pcv_color_view_2;
@@ -41,6 +66,10 @@ public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarC
     private int colorAlpha;
     private int offset = 100;
     private float[] matrixColorArray;
+    private GridView gv_porter_duff_modes;
+
+    private List<PorterDuffEntity> porterDuffEntities = new ArrayList<>();
+    private PaintMultiEffectView pmev_4;
 
     public static ViewDrawFragment getInstance(String title, @LayoutRes int layoutId) {
         return new ViewDrawFragment(title, layoutId);
@@ -68,15 +97,28 @@ public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarC
         switch_porter_duff_button = view.findViewById(R.id.switch_porter_duff_button);
         bt_change_mode = view.findViewById(R.id.bt_change_mode);
 
+        gv_porter_duff_modes = view.findViewById(R.id.gv_porter_duff_modes);
+        pmev_4 = view.findViewById(R.id.pmev_4);
+
         seek_red = view.findViewById(R.id.seek_red);
         seek_green = view.findViewById(R.id.seek_green);
         seek_blue = view.findViewById(R.id.seek_blue);
         seek_alpha = view.findViewById(R.id.seek_alpha);
         pcv_color_view_3 = view.findViewById(R.id.pcv_color_view_3);
 
+        initPorterDuffData();
         initSeekBar();
         initPorterDuffColorFilter();
         initMatrixColorFilter();
+        initPorterDuffMode();
+    }
+
+    private void initPorterDuffData() {
+        porterDuffEntities.clear();
+        for (int i = 0; i < X_FER_MODES.length; i++) {
+            PorterDuffEntity duffEntity = new PorterDuffEntity(X_FER_MODES[i], X_FER_MODE_STR_ARR[i]);
+            porterDuffEntities.add(duffEntity);
+        }
     }
 
     private void initSeekBar() {
@@ -111,7 +153,7 @@ public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarC
                     mCurrentPorterColorMode = 0;
                 }
                 PorterDuff.Mode mode = porterColorModes[mCurrentPorterColorMode];
-                PorterDuffColorFilter filter = new PorterDuffColorFilter(Color.BLUE, mode);
+                PorterDuffColorFilter filter = new PorterDuffColorFilter(Color.RED, mode);
                 pcv_color_view_2.setPorterDuffColorFilter(filter, mCurrentPorterColorMode);
                 mCurrentPorterColorMode++;
             });
@@ -126,6 +168,18 @@ public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarC
             seek_green.setOnSeekBarChangeListener(this);
             seek_blue.setOnSeekBarChangeListener(this);
             seek_alpha.setOnSeekBarChangeListener(this);
+        }
+    }
+
+    private void initPorterDuffMode() {
+        if (gv_porter_duff_modes != null && pmev_4 != null) {
+            PorterDuffModeAdapter adapter = new PorterDuffModeAdapter(mContext, porterDuffEntities);
+            gv_porter_duff_modes.setAdapter(adapter);
+            gv_porter_duff_modes.setOnItemClickListener((parent, view, position, id) -> {
+                PorterDuffEntity item = adapter.getItem(position);
+                PorterDuffXfermode xFermode = new PorterDuffXfermode(item.getMode());
+                pmev_4.setXFerPorterDuffMode(xFermode);
+            });
         }
     }
 
