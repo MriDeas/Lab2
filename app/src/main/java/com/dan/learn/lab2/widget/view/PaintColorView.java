@@ -99,7 +99,6 @@ public class PaintColorView extends View {
 
     private void drawPorterDuffColorFilter(Canvas canvas) {
         mPaint.setTextSize(20);
-
 //        rectF.set(400, 20, 500, 120);
         rectF2.set(460, 60, 560, 160);
 //        int count = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);

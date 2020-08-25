@@ -47,6 +47,7 @@ public class ViewKnowledgeActivity extends BaseActivity {
         list.add(ViewDrawFragment.getInstance("🖌 文字", R.layout.fragment_paint_text_view));
         list.add(ViewDrawFragment.getInstance("🖌 背景", R.layout.fragment_view_draw));
         list.add(ViewDrawFragment.getInstance("🖌 效果", R.layout.fragment_paint_effect_view));
+        list.add(ViewDrawFragment.getInstance("🖌 画板", R.layout.fragment_canvas_not_draw_layout));
 
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), list);
         vp_views.setAdapter(adapter);
