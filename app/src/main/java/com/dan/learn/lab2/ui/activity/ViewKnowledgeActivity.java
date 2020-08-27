@@ -41,6 +41,7 @@ public class ViewKnowledgeActivity extends BaseActivity {
     private void initView() {
         tab_layout.setupWithViewPager(vp_views);
         vp_views.setOffscreenPageLimit(3);
+
         List<BaseFragment> list = new ArrayList<>();
         list.add(ViewDrawFragment.getInstance("🖌 颜色", R.layout.fragment_paint_color_view));
         list.add(ViewDrawFragment.getInstance("🖌 Stroke", R.layout.fragment_paint_stroke_view));
@@ -48,6 +49,7 @@ public class ViewKnowledgeActivity extends BaseActivity {
         list.add(ViewDrawFragment.getInstance("🖌 背景", R.layout.fragment_view_draw));
         list.add(ViewDrawFragment.getInstance("🖌 效果", R.layout.fragment_paint_effect_view));
         list.add(ViewDrawFragment.getInstance("🖌 画板", R.layout.fragment_canvas_not_draw_layout));
+        list.add(ViewDrawFragment.getInstance("🖌 画板2", R.layout.fragment_canvas_2_layuot));
 
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), list);
         vp_views.setAdapter(adapter);

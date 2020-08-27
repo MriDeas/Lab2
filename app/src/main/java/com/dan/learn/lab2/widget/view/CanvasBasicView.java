@@ -16,7 +16,7 @@ public class CanvasBasicView extends View {
 
     private Paint mPaint;
     private Bitmap bitmap;
-    private Path mPath,mPath2;
+    private Path mPath, mPath2;
 
     public CanvasBasicView(Context context) {
         this(context, null);
@@ -41,8 +41,12 @@ public class CanvasBasicView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        canvas.save();
         canvasClipApi(canvas);
         canvasClipPathApi(canvas);
+        canvas.restore();
+        canvasDensity(canvas);
+
 //        canvas.clipRect();
 //        canvas.clipOutRect();
 //
@@ -100,7 +104,7 @@ public class CanvasBasicView extends View {
     private void canvasClipPathApi(Canvas canvas) {
 
         //clipPath 以path划定一个区域，仅在path区域内部绘制内容
-        mPaint.setColor(Color.argb(100,100,20, 150));
+        mPaint.setColor(Color.argb(100, 100, 20, 150));
         canvas.drawRect(100, 600, 350, 800, mPaint);
         mPaint.setColor(Color.CYAN);
         int saveLayer = canvas.saveLayer(null, mPaint, Canvas.ALL_SAVE_FLAG);
@@ -109,7 +113,7 @@ public class CanvasBasicView extends View {
         canvas.restoreToCount(saveLayer);
 
         mPaint.setColor(Color.BLACK);
-        canvas.drawText("clip path circle ", 110,810, mPaint);
+        canvas.drawText("clip path circle ", 110, 810, mPaint);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int saveLayer1 = canvas.saveLayer(null, mPaint);
@@ -117,14 +121,13 @@ public class CanvasBasicView extends View {
             mPaint.setColor(Color.DKGRAY);
             canvas.drawCircle(800, 900, 200, mPaint);
             mPaint.setColor(Color.WHITE);
-            canvas.drawText("canvas clip out path", 666, 999,mPaint);
+            canvas.drawText("canvas clip out path", 666, 999, mPaint);
             canvas.restoreToCount(saveLayer1);
         }
 
     }
 
-    private void canvasSkew(Canvas canvas) {
-        canvas.skew(0.1f, 0.25f);
+    private void canvasTranslate(Canvas canvas) {
 
     }
 
@@ -141,7 +144,14 @@ public class CanvasBasicView extends View {
     }
 
     private void canvasDensity(Canvas canvas) {
-
+        mPaint.setColor(Color.RED);
+        mPaint.setStrokeWidth(10);
+        int density = canvas.getDensity();
+        canvas.save();
+        canvas.drawLine(100, 900, 600, 900, mPaint);
+        canvas.drawText("density:" + density, 100, 950, mPaint);
+        canvas.setDensity(500);
+        canvas.restore();
     }
 
     private void canvasDrawFilter(Canvas canvas) {
