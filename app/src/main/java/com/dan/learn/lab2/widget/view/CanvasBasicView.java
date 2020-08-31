@@ -2,21 +2,30 @@ package com.dan.learn.lab2.widget.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DrawFilter;
 import android.graphics.Paint;
+import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import com.dan.learn.lab2.R;
 
 public class CanvasBasicView extends View {
 
     private Paint mPaint;
     private Bitmap bitmap;
     private Path mPath, mPath2;
+    private Canvas canvas2;
+    private Bitmap copyBitmap;
+    private DrawFilter drawFilter;
 
     public CanvasBasicView(Context context) {
         this(context, null);
@@ -24,7 +33,9 @@ public class CanvasBasicView extends View {
 
     public CanvasBasicView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-//        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        copyBitmap = bitmap.copy(Bitmap.Config.RGB_565, true);
+        canvas2 = new Canvas(copyBitmap);
     }
 
     {
@@ -34,7 +45,6 @@ public class CanvasBasicView extends View {
         mPath2 = new Path();
         mPath.addCircle(200, 700, 80, Path.Direction.CW);
         mPath2.addCircle(750, 850, 80, Path.Direction.CW);
-//        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
     }
 
     @Override
@@ -47,6 +57,8 @@ public class CanvasBasicView extends View {
         canvas.restore();
         canvasDensity(canvas);
 
+        canvasSetBitmap(canvas);
+        canvasDrawFilter(canvas);
 //        canvas.clipRect();
 //        canvas.clipOutRect();
 //
@@ -127,9 +139,6 @@ public class CanvasBasicView extends View {
 
     }
 
-    private void canvasTranslate(Canvas canvas) {
-
-    }
 
     private void canvasConcat(Canvas canvas) {
 
@@ -140,22 +149,37 @@ public class CanvasBasicView extends View {
     }
 
     private void canvasSetBitmap(Canvas canvas) {
-
+        canvas2.drawText("绘制canvas bitmap", 10, 100, mPaint);
+        canvas.drawCircle(50, 50, 35, mPaint);
+        canvas.drawBitmap(copyBitmap, 100, 1100, mPaint);
     }
 
     private void canvasDensity(Canvas canvas) {
         mPaint.setColor(Color.RED);
         mPaint.setStrokeWidth(10);
-        int density = canvas.getDensity();
+        canvas.setDensity(100);
+        Log.d("打印 --------------- ", "density: " + canvas.getDensity());
         canvas.save();
         canvas.drawLine(100, 900, 600, 900, mPaint);
-        canvas.drawText("density:" + density, 100, 950, mPaint);
+        canvas.drawBitmap(bitmap, 50, 900, mPaint);
         canvas.setDensity(500);
+        canvas.drawBitmap(bitmap, 200, 900, mPaint);
+        Log.d("打印 --------------- ", "density: " + canvas.getDensity());
         canvas.restore();
     }
 
     private void canvasDrawFilter(Canvas canvas) {
+        if (drawFilter == null) {
+            drawFilter = new PaintFlagsDrawFilter(Paint.ANTI_ALIAS_FLAG,
+                    Paint.STRIKE_THRU_TEXT_FLAG | Paint.UNDERLINE_TEXT_FLAG);
+            canvas.setDrawFilter(drawFilter);
+        }
 
+        mPaint.setTextSize(30);
+        mPaint.setColor(Color.BLACK);
+        canvas.drawText("绘制文字，设置PaintFlagsDrawFilter ，取消Alias，添加中划线 ",
+                100, 1300, mPaint);
+        canvas.setDrawFilter(null);
     }
 
 

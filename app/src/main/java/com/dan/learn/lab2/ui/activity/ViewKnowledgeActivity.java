@@ -1,7 +1,11 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.dan.learn.lab2.R;
@@ -51,10 +55,27 @@ public class ViewKnowledgeActivity extends BaseActivity {
         list.add(ViewDrawFragment.getInstance("🖌 画板", R.layout.fragment_canvas_not_draw_layout));
         list.add(ViewDrawFragment.getInstance("🖌 画板2", R.layout.fragment_canvas_2_layuot));
 
-        FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), list);
+        for (int i = 0; i < list.size(); i++) {
+            String title = list.get(i).getTitle();
+            TabLayout.Tab tab = makeTab(title);
+            tab_layout.addTab(tab);
+        }
+
+        FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(),list);
         vp_views.setAdapter(adapter);
     }
 
+    private TabLayout.Tab makeTab(String title) {
+        TabLayout.Tab tab = tab_layout.newTab();
+        TextView textView = new TextView(mContext);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        textView.setText(title);
+        textView.setPadding(20, 5, 20, 5);
+        textView.setLayoutParams(params);
+        tab.setCustomView(textView);
+        return tab;
+    }
 
 
 }
