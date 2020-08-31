@@ -45,18 +45,18 @@ android {
         }
     }
 
-    flavorDimensions 'price','nation'
-    productFlavors{
-        free{
+    flavorDimensions 'price', 'nation'
+    productFlavors {
+        free {
             dimension 'price'
         }
-        paid{
+        paid {
             dimension 'price'
         }
-        china{
+        china {
             dimension('nation')
         }
-        global{
+        global {
             dimension('nation')
         }
     }
