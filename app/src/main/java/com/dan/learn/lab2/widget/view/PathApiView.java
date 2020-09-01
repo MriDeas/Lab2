@@ -20,7 +20,7 @@ import androidx.annotation.RequiresApi;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class PathApiView extends View {
 
-    private Path path1, path2, path3, path4, path5, path6, path7;
+    private Path path1, path2, path3, path4, path5, path6, path7, path8, path9, path10,path11;
 
     private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -82,14 +82,34 @@ public class PathApiView extends View {
         path7 = new Path();
         path7.addCircle(500, 330, 100, Path.Direction.CW);
 
+        path8 = new Path();
+        path9 = new Path();
 //        path7.cubicTo();
-//        path7.quadTo();
+        path8.moveTo(300, 500);
+        //x1,y1是控制点 x2，y2是终点坐标，起点是moveTo()指定的坐标，或者0,0
+        path8.quadTo(100, 600, 900, 600);
+
+        path9.moveTo(600, 600);
+        path9.cubicTo(200, 900, 600, 800, 1000, 1000);
+
+        path10 = new Path();
+        path10.moveTo(260, 800);
+        path10.lineTo(400, 1000);
+        path10.lineTo(600, 1000);
+        path10.lineTo(800, 1200);
+
+        path11 = new Path();
+        path11.moveTo(330,900);
+        path11.quadTo(400, 1000, 500, 1000);
+        path11.quadTo(600, 1000, 700, 1100);
+        //连续调用quaTo时，前一个终点将作为新的起点。为了使线段平滑，要使倒数第二个触点作为新的控制点
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setColor(Color.RED);
         mPaint.setStrokeWidth(10);
         canvas.drawPath(path1, mPaint);
@@ -109,6 +129,28 @@ public class PathApiView extends View {
 
         canvas.drawPath(path4, mPaint);
 
+        canvas.drawPath(path8, mPaint);
 
+        mPaint.setTextSize(30);
+        mPaint.setStyle(Paint.Style.FILL);
+        //沿着path绘制文字， hOffset 文字距离开始位置的偏移量  vOffset 文字距path上下偏移量
+        canvas.drawTextOnPath(" 二 阶 贝 塞 尔 曲 线 ", path8, 120, 30, mPaint);
+
+
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setColor(Color.MAGENTA);
+        canvas.drawPath(path9, mPaint);
+        mPaint.setStyle(Paint.Style.FILL);
+        canvas.drawTextOnPath("三阶贝塞尔曲线", path9, 150, 50, mPaint);
+
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(2);
+        mPaint.setColor(Color.BLUE);
+        canvas.drawPath(path10, mPaint);
+
+        mPaint.setColor(Color.RED);
+        canvas.drawPath(path11,mPaint);
     }
+
+
 }

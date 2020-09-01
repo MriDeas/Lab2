@@ -12,7 +12,7 @@
        <com.dan.learn.lab2.widget.view.PathApiView
            android:layout_width="match_parent"
            android:background="@color/bt_light_color"
-           android:layout_height="200dp"/>
+           android:layout_height="500dp"/>
 
    </LinearLayout>
 
