@@ -44,6 +44,7 @@ public class ViewPathActivity extends BaseActivity {
         list.add(ViewDrawFragment.getInstance("🖌 Path", R.layout.fragment_path));
         list.add(ViewDrawFragment.getInstance("🖌 手势绘图", R.layout.fragment_gesture_path));
         list.add(ViewDrawFragment.getInstance("🖌 波浪", R.layout.fragment_path_wave_view));
+        list.add(ViewDrawFragment.getInstance("🖌 path effect", R.layout.fragment_path_effect_layout));
 
         FragmentsAdapter adapter = new FragmentsAdapter(getSupportFragmentManager(), list);
         vp_views.setAdapter(adapter);

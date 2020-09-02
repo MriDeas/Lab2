@@ -2,6 +2,8 @@ package com.dan.learn.lab2.widget.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -26,6 +28,8 @@ public class PathClipView extends androidx.appcompat.widget.AppCompatImageView {
     private Path path;
     private RectF rectF = new RectF();
     private GradientDrawable gradientDrawable;
+
+    private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public PathClipView(Context context) {
         super(context);
@@ -54,6 +58,8 @@ public class PathClipView extends androidx.appcompat.widget.AppCompatImageView {
         gradientDrawable = new GradientDrawable();
         gradientDrawable.setCornerRadii(radiusArr);
 
+        mPaint.setColor(Color.BLUE);
+        mPaint.setStyle(Paint.Style.STROKE);
     }
 
 
@@ -68,5 +74,7 @@ public class PathClipView extends androidx.appcompat.widget.AppCompatImageView {
     protected void onDraw(Canvas canvas) {
         canvas.clipPath(path);
         super.onDraw(canvas);
+
+
     }
 }
