@@ -7,13 +7,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
 import com.dan.learn.lab2.R;
@@ -38,16 +41,18 @@ public class PaintColorView extends View {
             PorterDuff.Mode.DST_OUT,
             PorterDuff.Mode.SRC_ATOP,
             PorterDuff.Mode.DST_ATOP,
-            PorterDuff.Mode.XOR,
-            PorterDuff.Mode.DARKEN,
-            PorterDuff.Mode.LIGHTEN,
-            PorterDuff.Mode.MULTIPLY,
-            PorterDuff.Mode.SCREEN
+            PorterDuff.Mode.XOR, //和 CLEAR一样，清除
+            PorterDuff.Mode.DARKEN, //变暗
+            PorterDuff.Mode.LIGHTEN, //变亮
+            PorterDuff.Mode.MULTIPLY, // 正片叠加
+            PorterDuff.Mode.SCREEN, //滤色
+            PorterDuff.Mode.ADD, //饱和度相加
+            PorterDuff.Mode.OVERLAY //叠加
     };
     private String[] modeStr = {
             "Clear", "SRC", "DST", "SRC_OVER", "DST_OVER", "SRC_IN",
             "DST_IN", "SRC_OUT", "DST_OUT", "SRC_ATOP", "DST_ATOP", "XOR", "DARKEN",
-            "LIGHTEN", "MULTIPLY", "SCREEN"
+            "LIGHTEN", "MULTIPLY", "SCREEN","ADD"
     };
 
     private static final int FILTER_MODE_LIGHT = 1;
@@ -60,11 +65,13 @@ public class PaintColorView extends View {
 
     private RectF rectF = new RectF();
 
-    private RectF rectF2 = new RectF();
+    private Rect rectF2 = new Rect();
 
     private int filterMode;
     private Bitmap bitmap;
     private int porterDuffColorFilterIndex;
+    private ColorFilter lightColorFilter;
+    private Bitmap bitmap_cat;
 
     public PaintColorView(Context context) {
         this(context, null);
@@ -85,7 +92,9 @@ public class PaintColorView extends View {
         super.onDraw(canvas);
         if (bitmap == null) {
             bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round);
+            bitmap_cat = BitmapFactory.decodeResource(getResources(), R.drawable.pic_cat);
         }
+
         if (filterMode == FILTER_MODE_LIGHT) {
             drawRoundRect(canvas);
             drawLightColorFilterRect(canvas);
@@ -98,24 +107,19 @@ public class PaintColorView extends View {
     }
 
     private void drawPorterDuffColorFilter(Canvas canvas) {
+        //PorterDuffColorFilter 只能完成与一个特定颜色值合成
+        canvas.save();
         mPaint.setTextSize(20);
-//        rectF.set(400, 20, 500, 120);
-        rectF2.set(460, 60, 560, 160);
-//        int count = canvas.saveLayer(null, null, Canvas.ALL_SAVE_FLAG);
-        canvas.drawBitmap(bitmap,400,20,mPaint);
-//        canvas.drawRect(rectF, mPaint);
+
+        rectF2.set(400, 60, 600, 200);
+        canvas.drawBitmap(bitmap_cat, null,rectF2, mPaint);
         mPaint.setColorFilter(porterDuffColorFilter);
-        canvas.drawRect(rectF2, mPaint);
 
+        rectF2.set(700, 60, 900, 300);
+        canvas.drawBitmap(bitmap_cat, null,rectF2,mPaint);
         mPaint.setColorFilter(null);
-//        canvas.restoreToCount(count);
+        canvas.restore();
 
-
-
-//        mPaint.setColor(Color.RED);
-//        canvas.drawRect(rectF, mPaint);
-//        mPaint.setColor(Color.GREEN);
-//        canvas.drawRect(rectF2, mPaint);
         mPaint.setTextSize(20);
         canvas.drawText(modeStr[porterDuffColorFilterIndex], 10, 20, mPaint);
     }
@@ -155,13 +159,28 @@ public class PaintColorView extends View {
     }
 
     private void drawLightColorFilterRect(Canvas canvas) {
+        mPaint.setColor(Color.rgb(0,255, 0));
+        ColorFilter colorFilter = mPaint.getColorFilter();
+        mPaint.setColorFilter(colorFilter);
         rectF.set(230, 10, 360, 300);
         canvas.drawRect(rectF, mPaint);
-        mPaint.setColor(Color.parseColor("#326b6b"));
+
+        mPaint.setColorFilter(null);
+        rectF.set(600, 10, 800, 300);
+        canvas.drawRect(rectF, mPaint);
     }
 
     private void drawLightColorFilterBitmap(Canvas canvas) {
+        mPaint.setColor(Color.GREEN);
+        mPaint.setColorFilter(getLightColorFilter(0xffffff,0x00f000));
         canvas.drawBitmap(bitmap, 380, 10, mPaint);
+    }
+
+    private ColorFilter getLightColorFilter(@ColorInt int mul, @ColorInt int add){
+        if(lightColorFilter == null){
+            lightColorFilter = new LightingColorFilter(mul, add);
+        }
+        return lightColorFilter;
     }
 
     public PorterDuff.Mode[] getPorterColorModes() {

@@ -125,7 +125,15 @@ public class ViewDrawFragment extends BaseFragment implements SeekBar.OnSeekBarC
         if (switch_light_button != null && pcv_color_view != null) {
             switch_light_button.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
-                    LightingColorFilter colorFilter = new LightingColorFilter(0xFFFFFF, 0x0000FF);
+                    //LightingColorFilter 0xffffff = 0xRRGGBB 分别是 R = ff, G = ff, B = ff 不支持透明度
+                    //这里 mul = 0x0000ff  add = 0x0000ff
+                    //mPaint.setColor(Color.rgb(0,255, 0)); 颜色只有绿色
+                    //最终结果是 ： R = 0 * (mul)0x00 + (add)0x00 = 0
+                    //            G = 255 * (mul)0x00 + (add)0x00 = 0
+                    //            B = 0 * (mul)0x00 + (add)0xff = 255
+                    //设置lightColorFilter 之后颜色就成了 蓝色
+
+                    LightingColorFilter colorFilter = new LightingColorFilter(0x0000FF, 0x0000FF);
                     pcv_color_view.setLightColorFilter(colorFilter);
                 } else {
                     pcv_color_view.setLightColorFilter(null);
