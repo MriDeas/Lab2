@@ -240,7 +240,7 @@ public class PaintMultiEffectView extends View {
 
     private void drawShadowLayer(Canvas canvas) {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null); //关闭硬件加速
-        canvas.drawColor(Color.DKGRAY);
+        canvas.drawColor(Color.LTGRAY);
 
         mPaint.setColor(Color.RED);
         mPaint.setShadowLayer(10, 10, 10, Color.WHITE);
@@ -269,6 +269,11 @@ public class PaintMultiEffectView extends View {
         mPaint.setColor(Color.MAGENTA);
         mPaint.setShadowLayer(6, -10, -20, Color.WHITE);
         canvas.drawCircle(600, 100, 30, mPaint);
+
+        mPaint.setTextSize(30);
+        mPaint.setColor(Color.WHITE);
+        mPaint.setShadowLayer(2, 30, 23, Color.GRAY);
+        canvas.drawText("微信读书", 100,200,mPaint);
     }
 
     private void drawMaskFilter2(Canvas canvas) {

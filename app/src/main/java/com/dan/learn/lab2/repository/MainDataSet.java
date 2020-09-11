@@ -5,6 +5,7 @@ import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
 import com.dan.learn.lab2.ui.activity.AnnotationActivity;
 import com.dan.learn.lab2.ui.activity.AppCustomThemeActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
+import com.dan.learn.lab2.ui.activity.CanvasActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.DrawFuncViewActivity;
@@ -13,6 +14,7 @@ import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
 import com.dan.learn.lab2.ui.activity.ViewKnowledgeActivity;
 import com.dan.learn.lab2.ui.activity.ViewPathActivity;
+import com.dan.learn.lab2.ui.activity.XfermodeViewActivity;
 
 import java.util.List;
 
@@ -40,10 +42,14 @@ public class MainDataSet {
         createAppTheme();
     }
 
+
+
     private void createViewKnowledge() {
         FuncGroupEntity view = makeGroup("View基础");
         view.addChild("View 基础 Paint", "View 画笔", ViewKnowledgeActivity.class);
         view.addChild("View 基础 Path", "View Path", ViewPathActivity.class);
+        view.addChild("View 基础 Xfermode", "View Xfermode", XfermodeViewActivity.class);
+        view.addChild("View 基础 Canvas", "View Canvas", CanvasActivity.class);
     }
 
     private void createRxJavaData() {

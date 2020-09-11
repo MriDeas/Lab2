@@ -18,7 +18,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.DrawFuncViewActivity"></activity>
+        <activity android:name=".ui.activity.DrawFuncViewActivity"/>
+        <activity android:name=".ui.activity.XfermodeViewActivity"/>
+        <activity android:name=".ui.activity.CanvasActivity"/>
 
         <receiver android:name=".widget.MiniToDoWidget">
             <intent-filter>
