@@ -12,6 +12,7 @@ import com.dan.learn.lab2.ui.activity.DrawFuncViewActivity;
 import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
+import com.dan.learn.lab2.ui.activity.ViewDemoActivity;
 import com.dan.learn.lab2.ui.activity.ViewKnowledgeActivity;
 import com.dan.learn.lab2.ui.activity.ViewPathActivity;
 import com.dan.learn.lab2.ui.activity.XfermodeViewActivity;
@@ -62,6 +63,7 @@ public class MainDataSet {
         viewKnowledge.addChild("拖拽控件", "拖拽", DragViewActivity.class);
         viewKnowledge.addChild("自定义组件", "其他组件", CustomWidgetsActivity.class);
         viewKnowledge.addChild("自定义控件", "View 绘制系列", DrawFuncViewActivity.class);
+        viewKnowledge.addChild("自定义控件", "View Demo ", ViewDemoActivity.class);
     }
 
     private void createDatabase() {
