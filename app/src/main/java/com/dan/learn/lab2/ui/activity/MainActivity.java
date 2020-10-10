@@ -1,9 +1,14 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Trace;
 import android.view.View;
 import android.widget.ExpandableListView;
+
+import androidx.annotation.RequiresApi;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.adapter.MainFuncAdapter;
@@ -23,6 +28,24 @@ public class MainActivity extends BaseActivity {
     @Override
     protected int getContentLayout() {
         return R.layout.activity_main;
+    }
+
+    private boolean flag = true;
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && flag) {
+            Trace.beginSection("结束时间");
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Trace.endSection();
+                }
+            }, 500);
+            flag = false;
+        }
     }
 
     @Override

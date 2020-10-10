@@ -13,6 +13,7 @@ import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
 import com.dan.learn.lab2.ui.activity.ViewKnowledgeActivity;
 import com.dan.learn.lab2.ui.activity.ViewPathActivity;
+import com.dan.learn.lab2.ui.activity.WebViewActivity;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class MainDataSet {
         createDatabase();
         createViewKnowledge();
         createCustomView();
+        createWeb();
         createMultiThread();
         createRxJavaData();
         createCamera();
@@ -56,6 +58,11 @@ public class MainDataSet {
         viewKnowledge.addChild("拖拽控件", "拖拽", DragViewActivity.class);
         viewKnowledge.addChild("自定义组件", "其他组件", CustomWidgetsActivity.class);
         viewKnowledge.addChild("自定义控件", "View 绘制系列", DrawFuncViewActivity.class);
+    }
+
+    private void createWeb(){
+        FuncGroupEntity viewKnowledge = makeGroup("WebView");
+        viewKnowledge.addChild("WebView", "使用", WebViewActivity.class);
     }
 
     private void createDatabase() {
