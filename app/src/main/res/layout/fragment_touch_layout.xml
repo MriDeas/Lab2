@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.dan.learn.lab2.widget.demo.TouchView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@color/colorAccent" />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:text="ToolTip"
+        android:textColor="@color/colorAccent"
+        android:tooltipText="哈哈哈🙄😝😃" />
+
+</FrameLayout>
