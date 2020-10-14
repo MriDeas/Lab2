@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.dan.learn.lab2.R;
 
-public class TouchView extends View {
+public class MultiTouchView extends View {
 
 
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -28,7 +28,7 @@ public class TouchView extends View {
     private float originalOffsetY;
     private int trackedPointerId;
 
-    public TouchView(Context context, @Nullable AttributeSet attrs) {
+    public MultiTouchView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.bac_shortcut);
     }

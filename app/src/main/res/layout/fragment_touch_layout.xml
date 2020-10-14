@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.dan.learn.lab2.widget.demo.TouchView
+    <com.dan.learn.lab2.widget.demo.MultiTouchView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorAccent" />
