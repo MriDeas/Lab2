@@ -11,8 +11,9 @@ public class ViewDemoActivity extends BaseMultiFragmentActivity {
 
     @Override
     protected List<BaseFragment> getFragments(List<BaseFragment> fragments) {
-        fragments.add(new ViewDemoFragment("TabLayout", R.layout.fragment_tab_layout));
-        fragments.add(new ViewDemoFragment("TouchView", R.layout.fragment_touch_layout));
+        fragments.add(new ViewDemoFragment("Tab_Layout", R.layout.fragment_tab_layout));
+        fragments.add(new ViewDemoFragment("Touch_View", R.layout.fragment_touch_layout));
+        fragments.add(new ViewDemoFragment("View_Pager", R.layout.fragment_view_pager));
         return fragments;
     }
 
