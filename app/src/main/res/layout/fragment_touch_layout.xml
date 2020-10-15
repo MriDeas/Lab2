@@ -6,13 +6,19 @@
     <com.dan.learn.lab2.widget.demo.MultiTouchView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:visibility="gone" />
+
+    <com.dan.learn.lab2.widget.demo.MultiTouchView2
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/colorAccent" />
 
     <TextView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
         android:text="ToolTip"
         android:textColor="@color/colorAccent"
         android:tooltipText="哈哈哈🙄😝😃" />

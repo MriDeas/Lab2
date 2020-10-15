@@ -13,8 +13,8 @@ import androidx.annotation.Nullable;
 
 import com.dan.learn.lab2.R;
 
+//协作型 互不干扰型
 public class MultiTouchView extends View {
-
 
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Bitmap bitmap;
