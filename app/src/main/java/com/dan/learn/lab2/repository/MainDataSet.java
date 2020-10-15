@@ -4,6 +4,7 @@ import com.dan.learn.lab2.entity.FuncGroupEntity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
 import com.dan.learn.lab2.ui.activity.AnnotationActivity;
 import com.dan.learn.lab2.ui.activity.AppCustomThemeActivity;
+import com.dan.learn.lab2.ui.activity.BitmapActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
@@ -40,6 +41,12 @@ public class MainDataSet {
         createAnnotation();
         createUnitTest();
         createAppTheme();
+        createBitmapPage();
+    }
+
+    private void createBitmapPage() {
+        FuncGroupEntity bitmapEntity = makeGroup("Bitmap操作");
+        bitmapEntity.addChild("Bitmap 参数", "Bitmap参数", BitmapActivity.class);
     }
 
     private void createViewKnowledge() {
@@ -60,7 +67,7 @@ public class MainDataSet {
         viewKnowledge.addChild("自定义控件", "View 绘制系列", DrawFuncViewActivity.class);
     }
 
-    private void createWeb(){
+    private void createWeb() {
         FuncGroupEntity viewKnowledge = makeGroup("WebView");
         viewKnowledge.addChild("WebView", "使用", WebViewActivity.class);
     }
