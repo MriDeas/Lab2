@@ -22,47 +22,47 @@ android {
     }
 }
 
-task hello {
-    String p = "hello"
-    String q = "$p world"
-    println(q)
-}
+//task hello {
+//    String p = "hello"
+//    String q = "$p world"
+//    println(q)
+//}
 
 //通过dependsOn建立两个任务之间的依赖关系
-task world(dependsOn:hello){
-    println("执行task hello 之后，将执行该任务")
-}
+//task world(dependsOn:hello){
+//    println("执行task hello 之后，将执行该任务")
+//}
+//
+//4.times {
+//    counter ->
+//        task "task$counter" {
+//            println("I'm task number $counter")
+//        }
+//}
 
-4.times {
-    counter ->
-        task "task$counter" {
-            println("I'm task number $counter")
-        }
-}
+//task hi{
+//    println('hello Earth')
+//}
 
-task hi{
-    println('hello Earth')
-}
-
-hi.doFirst{
-    println('hello Venus')
-}
+//hi.doFirst{
+//    println('hello Venus')
+//}
 
 //hi.doFirst{
 //    println('hello Venus 2')
 //}
 
-hi.doLast{
-    println("hello Mars")
-}
+//hi.doLast{
+//    println("hello Mars")
+//}
 
 //hi{
 //    println("hello Chinese")
 //}
 
-hi {
-    println("hello Jupiter")
-}
+//hi {
+//    println("hello Jupiter")
+//}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])

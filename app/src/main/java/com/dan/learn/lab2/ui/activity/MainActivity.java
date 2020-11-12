@@ -38,12 +38,7 @@ public class MainActivity extends BaseActivity {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus && flag) {
             Trace.beginSection("结束时间");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Trace.endSection();
-                }
-            }, 500);
+            new Handler().postDelayed(() -> Trace.endSection(), 500);
             flag = false;
         }
     }
@@ -68,13 +63,7 @@ public class MainActivity extends BaseActivity {
             navigateTo(child.getTarget());
             return true;
         });
-        elv_expand_list.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-
-                return false;
-            }
-        });
+        elv_expand_list.setOnGroupClickListener((parent, v, groupPosition, id) -> false);
     }
 
     private void navigateTo(Class clazz) {

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: "org.sonarqube"
 
 android {
     signingConfigs {
@@ -64,6 +65,14 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main"
+//        property "sonar.java.binaries", "build/intermediates/classes"
+//        property "sonar.test.binaries", "build/intermediates/classes"
     }
 }
 
