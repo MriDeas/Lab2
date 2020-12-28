@@ -1,14 +1,18 @@
 package com.dan.learn.lab2.repository;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.dan.learn.lab2.entity.FuncGroupEntity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
 import com.dan.learn.lab2.ui.activity.AnnotationActivity;
 import com.dan.learn.lab2.ui.activity.AppCustomThemeActivity;
 import com.dan.learn.lab2.ui.activity.BitmapActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
+import com.dan.learn.lab2.ui.activity.CoordinatorActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.DrawFuncViewActivity;
+import com.dan.learn.lab2.ui.activity.RecyclerActivity;
 import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
 import com.dan.learn.lab2.ui.activity.UnitTestActivity;
@@ -65,6 +69,8 @@ public class MainDataSet {
         viewKnowledge.addChild("拖拽控件", "拖拽", DragViewActivity.class);
         viewKnowledge.addChild("自定义组件", "其他组件", CustomWidgetsActivity.class);
         viewKnowledge.addChild("自定义控件", "View 绘制系列", DrawFuncViewActivity.class);
+        viewKnowledge.addChild("RecyclerView", "RecyclerView 黏性控件", RecyclerActivity.class);
+        viewKnowledge.addChild("CoordinatorLayout", "Coordinator 组合控件使用", CoordinatorActivity.class);
     }
 
     private void createWeb() {

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.activity.CoordinatorActivity">
+
+    <com.dan.learn.lab2.widget.view.refresh.views.SwipeLayout
+        android:id="@+id/sp_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:load_more_enabled="false"
+        app:refresh_enabled="true">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/swipe_target"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/app_bar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@color/colorAccent"
+                    app:layout_scrollFlags="scroll" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/bg_light_color" />
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </com.dan.learn.lab2.widget.view.refresh.views.SwipeLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="stopRefresh"
+        android:text="Stop" />
+</RelativeLayout>

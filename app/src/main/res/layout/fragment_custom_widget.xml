@@ -18,7 +18,8 @@
         android:inAnimation="@anim/anim_marquee_in"
         android:outAnimation="@anim/anim_marquee_out"
         android:paddingLeft="30dp"
-        android:paddingRight="30dp">
+        android:paddingRight="30dp"
+        android:visibility="gone">
 
         <include layout="@layout/view_advertisement_0" />
     </ViewFlipper>
@@ -26,21 +27,58 @@
     <com.dan.learn.lab2.widget.AdvertisementVerticalLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:autoStart="true"
         app:interval="5000">
 
         <include layout="@layout/view_advertisement_0" />
     </com.dan.learn.lab2.widget.AdvertisementVerticalLayout>
 
+
     <Button
         android:id="@+id/bt_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="action" />
+        android:text="action"
+        android:visibility="gone" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.dan.learn.lab2.widget.CustomEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textCursorDrawable="@drawable/editor_cursor_1" />
 
     <ImageView
         android:id="@+id/iv_image"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary" />
+
+            <View
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent" />
+
+            <View
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimaryDark" />
+        </LinearLayout>
+    </HorizontalScrollView>
 </LinearLayout>

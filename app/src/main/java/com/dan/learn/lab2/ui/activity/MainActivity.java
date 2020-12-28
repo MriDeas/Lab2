@@ -1,6 +1,7 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,6 +46,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        setTheme(R.style.WelcomeTheme2);
+        getTheme().applyStyle(R.style.WelcomeTheme2,true);
         super.onCreate(savedInstanceState);
         initView();
         initData();
@@ -64,6 +67,8 @@ public class MainActivity extends BaseActivity {
             return true;
         });
         elv_expand_list.setOnGroupClickListener((parent, v, groupPosition, id) -> false);
+
+//        elv_expand_list.postDelayed(this::recreate,2000);
     }
 
     private void navigateTo(Class clazz) {

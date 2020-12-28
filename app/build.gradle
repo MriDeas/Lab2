@@ -98,4 +98,5 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.google.okhttp:okhttp:20120626'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.zhouyou:easyrecyclerview:1.0.6'
 }
