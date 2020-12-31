@@ -3,6 +3,9 @@ package com.dan.learn.lab2.ui.activity;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.graphics.Matrix;
+import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -17,6 +20,13 @@ import com.dan.learn.lab2.ui.fragment.ViewDemoFragment;
 import java.util.List;
 
 public class ViewDemoActivity extends BaseMultiFragmentActivity {
+
+    private Animation animationT;
+    private Animation animationS;
+    private Animation animationA;
+    private Animation animationR;
+    private ObjectAnimator animationO;
+    private ValueAnimator animationV;
 
     @Override
     protected List<BaseFragment> getFragments(List<BaseFragment> fragments) {
@@ -33,12 +43,47 @@ public class ViewDemoActivity extends BaseMultiFragmentActivity {
 //    }
 
     private void animation() {
-        Animation a = new ScaleAnimation(1, 1, 1.5f, 1.5f);
-        Animation b = new TranslateAnimation(0, 0, 100, 100);
-        Animation c = new AlphaAnimation(1, 0.86f);
-        Animation d = new RotateAnimation(0, 90);
-        ObjectAnimator f = ObjectAnimator.ofFloat(null, "title", 1, 2, 3, 4, 5, 6, 7);
-        ValueAnimator g = ValueAnimator.ofFloat(100);
+        animationS = new ScaleAnimation(1, 1, 1.5f, 1.5f);
+        animationT = new TranslateAnimation(0, 0, 100, 100);
+        animationA = new AlphaAnimation(1, 0.86f);
+        animationR = new RotateAnimation(0, 90);
+        animationO = ObjectAnimator.ofFloat(null, "title", 1, 2, 3, 4, 5, 6, 7);
+        animationV = ValueAnimator.ofFloat(100);
         PropertyValuesHolder p = PropertyValuesHolder.ofFloat("translationX",300f);
+
+        animationS.setDuration(500);
+        animationS.setFillAfter(true);
+        animationS.setFillEnabled(true);
+        animationS.setInterpolator(new AccelerateDecelerateInterpolator());
+        animationS.setBackgroundColor(getResources().getColor(R.color.bg_light_color));
+        animationS.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        animationS.start();
+        animationS.startNow();
+        new View(mContext).startAnimation(animationS);
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(1,1);
+        matrix.preScale(1,1);
+        matrix.postScale(1,1);
+        matrix.mapPoints(new float[5]);
+        matrix.setTranslate(10,10);
+        matrix.setRotate(0);
     }
+
+    
 }
