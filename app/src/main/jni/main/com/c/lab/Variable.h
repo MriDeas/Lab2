@@ -12,5 +12,4 @@ class Variable {
 };
 
 
-
 #endif //LAB2_VARIABLE_H

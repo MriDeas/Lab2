@@ -26,6 +26,7 @@
         android:layout_gravity="bottom"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
+        android:visibility="gone"
         android:weightSum="5">
 
         <TextView

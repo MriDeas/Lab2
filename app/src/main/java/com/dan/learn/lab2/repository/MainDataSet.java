@@ -12,6 +12,7 @@ import com.dan.learn.lab2.ui.activity.CoordinatorActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.DrawFuncViewActivity;
+import com.dan.learn.lab2.ui.activity.OrientationActivity;
 import com.dan.learn.lab2.ui.activity.RecyclerActivity;
 import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
 import com.dan.learn.lab2.ui.activity.ThreadActivity;
@@ -46,6 +47,12 @@ public class MainDataSet {
         createUnitTest();
         createAppTheme();
         createBitmapPage();
+        createOrientationPage();
+    }
+
+    private void createOrientationPage() {
+        FuncGroupEntity group = makeGroup("屏幕方向");
+        group.addChild("屏幕方向变化", "", OrientationActivity.class);
     }
 
     private void createBitmapPage() {

@@ -18,7 +18,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.CoordinatorActivity"/>
+        <activity
+            android:name=".ui.activity.OrientationActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity android:name=".ui.activity.CoordinatorActivity" />
         <activity android:name=".ui.activity.RecyclerActivity" />
         <activity android:name=".ui.activity.BitmapActivity" />
         <activity android:name=".ui.activity.WebViewActivity" />
