@@ -13,4 +13,40 @@
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bt_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="刷新Item" />
+
+            <Button
+                android:id="@+id/bt_refresh_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="刷新内容" />
+
+            <Button
+                android:id="@+id/bt_refresh_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除第一个" />
+
+            <Button
+                android:id="@+id/bt_refresh_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除最后一个" />
+        </LinearLayout>
+
+    </HorizontalScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
