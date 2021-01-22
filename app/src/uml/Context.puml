@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class Context
+
+class ContextWrapper extends Context {
+ Context mBase;
+}
+
+class ContextThemeWrapper extends ContextWrapper {
+
+}
+
+class ContextImpl extends Context {
+   #ActivityThread mMainThread;
+   -ClassLoader mClassLoader;
+
+   getResources():Resource
+   startActivity();
+   sendBroadCast();
+   getSystemService();
+   getAsserts();
+   getPackageManager();
+}
+
+class Activity extends ContextThemeWrapper {
+
+}
+
+class Service extends ContextWrapper {
+
+}
+
+class Application extends ContextWrapper {
+
+}
+
+@enduml

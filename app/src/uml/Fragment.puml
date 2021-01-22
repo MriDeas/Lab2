@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract FragmentContainer{
+ +abstract onFindViewById(int id):View
+ +abstract onHasView():boolean;
+ +instantiate(Context c,String className,Bundle argument):Fragment;
+}
+
+abstract class FragmentHostCallback {
+ -Activity activity;
+ -Context context;
+ -Handler handler;
+ #FragmentManagerImpl mFragmentManager = new FragmentManagerImpl();
+}
+
+
+class FragmentController {
+ -FragmentHostCallback<?> mHost;
+ +getSupportFragmentManager():FragmentManager;
+ +onViewCreate();
+ +dispatchCreate();
+ +dispatchOnActivityCreate();
+ +dispatch...();
+}
+
+class FragmentManager {
+
+}
+
+class BackStackRecord{
+
+}
+
+interface FragmentTransaction
+
+FragmentContainer <|-- FragmentHostCallback
+FragmentHostCallback <-- FragmentController
+
+
+@enduml

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 
+import androidx.fragment.app.FragmentActivity;
+
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.service.DemoAccessibilityService;
 import com.dan.learn.lab2.ui.base.BaseActivity;
@@ -16,6 +18,8 @@ import butterknife.OnClick;
  */
 public class AccessibilityServiceLabActivity extends BaseActivity {
 
+
+
     @Override
     protected int getContentLayout() {
         return R.layout.activity_accessibility_service_lab;
@@ -24,7 +28,6 @@ public class AccessibilityServiceLabActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
     }
 
@@ -37,6 +40,9 @@ public class AccessibilityServiceLabActivity extends BaseActivity {
                 startActivity(new Intent(Settings.ACTION_SETTINGS));
             }
         }
+
+        getResources().getDrawable(R.mipmap.bac_panda);
+        getResources().getString(R.string.app_name);
     }
 
 }
