@@ -1,0 +1,98 @@
+Fragment
+
+- FragmentActivity
+    - 1. 持有FragmentController实例，在Activity生命周期函数和其他回调函数中调用FragmentController对应函数
+    - 2. FragmentActivity中有 HostCallbacks 继承自 FragmentHostCallback,其实现函数会调用FragmentActivity中的函数
+    - 3. FragmentController持有 HostCallbacks 的实例，而其父类 FragmentHostCallback 中有FragmentManagerImpl实例
+    - 4. 在 FragmentActivity 中回调 FragmentController的函数，实际上调用的都是 FragmentHostCallback 的FragmentManager实例的函数
+    - 5. FragmentHostCallback 中主要是从Fragment中 申请权限、启动Activity，窗口动画，findViewById回调函数，同时持有Activity，Context，主线程Handler和FragmentManagerImpl实例
+
+
+- FragmentTransaction
+  - 1. 关键函数 add、replace、remove、hide、show、detach、attach、isEmpty等，用于Fragment相关的操作
+  - 2. 另外有 设置Fragment的窗口动画：setCustomAnimations()和 addToBackStack添加回退栈等操作函数
+  - 3. 提供commit()、commitNow()、commitNowAllowingStateLoss()等提交事务
+
+  - 4. 嵌套类 Op， 内部定义了第一步函数相应的命令、Fragment、窗口动画、Lifecycle.State
+  - 5. ArrayList<Op> mOps 集合，所有由第一步函数操作的Fragment和命令都会封装为Op对象，存入mOps
+  - 6. addToBackStack(String name) 会将内部属性 mAddToBackStack 置为true，并为mName赋值，标记将事务添加到回退栈中（事务在commit之后会被记录）
+  - 7. commit()、commitAllowingStateLoss()、commitNow()、commitNowAllowingStateLoss()等为抽象函数，由BackStackRecord实现
+
+
+- BackStackEntry
+    - 1. BackStackEntry 接口定义了几个函数，getId()、getName()等
+
+
+- BackStackRecord
+    - commit/commitAllowingStateLoss -> commitInternal(false/true)
+    - commitNow/commitNowAllowingStateLoss -> disallowAddToBackStack & mManager.execSingleAction
+
+    - commitInternal
+       - if(mAddToBackStack) 将事务记录加入 FragmentManagerImpl 的栈中，返回index，否则index置为-1
+       - -> FragmentManagerImpl.enqueueAction(BackStackRecord record,boolean allowStateLoss)
+
+    - commitNow() -> mManager.execSingleAction(BackStackRecord record,boolean allowStateLoss);
+
+    - generateOps() commit()期间将陆续即将发生的操作行为添加到list中
+
+
+- abstract FragmentManager
+
+   1. 事务操作
+      - beginTransaction = FragmentTransaction
+      - executePendingTransactions
+
+   2. 寻找Fragment
+      - findFragmentById
+      - findFragmentByTag
+
+   3. 栈操作
+      - popBackStack
+      - popBackStackImmediate
+      - popBackStack(String name, int flags)
+      - popBackStackImmediate(String name, int flags)
+      - popBackStack(int id, int flags)
+      - popBackStackImmediate(int id, int flags)
+
+    4. 获取栈信息：
+      - getBackStackEntryCount()
+      - getBackStackEntryAt(int index)
+
+    5. Fragment操作
+       - putFragment(Bundle bundle,String key,Fragment fragment)
+       - getFragment(Bundle bundle,String key)
+       - getFragments()
+       - saveFragmentInstanceState(Fragment f)
+
+
+- FragmentManagerImpl
+
+  - beginTransaction()  = new BackStackRecord(this) 每个事务包含FragmentMamagerImpl的yiny
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
