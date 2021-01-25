@@ -67,7 +67,7 @@ Fragment
 
 - FragmentManagerImpl
 
-  - beginTransaction()  = new BackStackRecord(this) 每个事务包含FragmentManagerImpl的
+  - beginTransaction()  = new BackStackRecord(this) 每个事务包含FragmentManagerImpl的引用
 
 
 
