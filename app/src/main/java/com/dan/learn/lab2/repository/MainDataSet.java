@@ -12,6 +12,7 @@ import com.dan.learn.lab2.ui.activity.CoordinatorActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
 import com.dan.learn.lab2.ui.activity.DragViewActivity;
 import com.dan.learn.lab2.ui.activity.DrawFuncViewActivity;
+import com.dan.learn.lab2.ui.activity.FragmentPageActivity;
 import com.dan.learn.lab2.ui.activity.OrientationActivity;
 import com.dan.learn.lab2.ui.activity.RecyclerActivity;
 import com.dan.learn.lab2.ui.activity.RxJavaBasicActivity;
@@ -48,6 +49,12 @@ public class MainDataSet {
         createAppTheme();
         createBitmapPage();
         createOrientationPage();
+        createFragmentPage();
+    }
+
+    private void createFragmentPage() {
+        FuncGroupEntity group = makeGroup("Fragment");
+        group.addChild("Fragment", "", FragmentPageActivity.class);
     }
 
     private void createOrientationPage() {

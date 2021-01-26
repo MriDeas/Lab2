@@ -67,9 +67,17 @@ Fragment
 
 - FragmentManagerImpl
 
-  - beginTransaction()  = new BackStackRecord(this) 每个事务包含FragmentManagerImpl的引用
+  - beginTransaction()  = new BackStackRecord(this) 每个事务都包含FragmentManagerImpl的引用
+  - enqueueAction() 在BackStackRecord中执行commitInternal()函数，-> FragmentManagerImpl.enqueueAction(OpGenerator action, boolean allowStateLoss),
+    将当前事务记录BackStackRecord添加到 FMI中的 mPendingActions 中
+      - mPendingActions FMI中用来存储当前事务记录，后续会从中取出记录并以Handler.post(Runnable run)方式添加到消息队列然后执行其他操作，在主线程中取出然后添加到FMI的栈容器 mTmpRecords 中，之后会被清空；
+      - FMI enqueueAction() -> (syn) scheduleCommit() -> mHost.Handler.post(mExecCommit) -> run(){ execPendingActions()} -> generateOpsForPendingActions() 将PendingActions中记录添加到 mTmpRecords，然后清除PendingActions
+                                                                                                                         -> doPendingDeferredStart() -> startPendingDeferredFragments() -> for{performPendingDeferredStart() -> moveToState()}
+        - enqueueAction() allowStateLoss 「 1. if(!allowStateLoss) 将不允许在onSaveInstanceState函数之后执行commit； 2. allowStateLoss 若Activity已经销毁或mHost==null，将不再执行commit提交事务，也不会抛出异常 」
 
-
+      - FMI execSingleAction(OpGenerator action, boolean allowStateLoss)
+            - if(allowStateLoss && (mHost == null || mDestroyed)) 不再commit，否则生成临时栈容器 mTmpRecords，把当前的BackStackRecord加入栈中
+            （无论 enqueueAction 还是 execSingleAction，都会最终将mTmpRecords容器内容清理）
 
 
 
