@@ -1,5 +1,6 @@
 package com.dan.learn.lab2.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -44,8 +45,21 @@ public class TestFPageFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        printFragmentLifeCycle("onAttach");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        printFragmentLifeCycle("onActivityCreated");
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        printFragmentLifeCycle("onCreate");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
         }
@@ -55,6 +69,7 @@ public class TestFPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        printFragmentLifeCycle("onCreateView");
         return inflater.inflate(R.layout.fragment_test_f_page, container, false);
     }
 
@@ -63,5 +78,52 @@ public class TestFPageFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         TextView tv_fragment_text = view.findViewById(R.id.tv_fragment_text);
         tv_fragment_text.setText(mParam1);
+        printFragmentLifeCycle("onViewCreated");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        printFragmentLifeCycle("onSaveInstanceState");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        printFragmentLifeCycle("onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        printFragmentLifeCycle("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        printFragmentLifeCycle("onStop");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        printFragmentLifeCycle("onDetach");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        printFragmentLifeCycle("onDestroy");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        printFragmentLifeCycle("onDestroyView");
+    }
+
+    private void printFragmentLifeCycle(String tag) {
+        System.out.println("打印执行函数 ----------- Fragment" + mParam1 + "::" + tag);
     }
 }

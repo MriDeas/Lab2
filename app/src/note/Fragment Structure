@@ -65,7 +65,7 @@ Fragment
        - saveFragmentInstanceState(Fragment f)
 
 
-- FragmentManagerImpl
+- FragmentManagerImpl（FMI）
 
   - beginTransaction()  = new BackStackRecord(this) 每个事务都包含FragmentManagerImpl的引用
   - enqueueAction() 在BackStackRecord中执行commitInternal()函数，-> FragmentManagerImpl.enqueueAction(OpGenerator action, boolean allowStateLoss),
@@ -75,10 +75,13 @@ Fragment
                                                                                                                          -> doPendingDeferredStart() -> startPendingDeferredFragments() -> for{performPendingDeferredStart() -> moveToState()}
         - enqueueAction() allowStateLoss 「 1. if(!allowStateLoss) 将不允许在onSaveInstanceState函数之后执行commit； 2. allowStateLoss 若Activity已经销毁或mHost==null，将不再执行commit提交事务，也不会抛出异常 」
 
-      - FMI execSingleAction(OpGenerator action, boolean allowStateLoss)
+  - execSingleAction() FMI execSingleAction(OpGenerator action, boolean allowStateLoss)
             - if(allowStateLoss && (mHost == null || mDestroyed)) 不再commit，否则生成临时栈容器 mTmpRecords，把当前的BackStackRecord加入栈中
-            （无论 enqueueAction 还是 execSingleAction，都会最终将mTmpRecords容器内容清理）
+            （无论 enqueueAction 还是 execSingleAction，在提交完事务以后，都会将mTmpRecords容器内容清除）
 
+
+  - commit提交最终执行函数：
+      - removeRedundantOperationsAndExecute(mTmpRecords, mTmpIsPop);
 
 
 
