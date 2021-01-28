@@ -4,6 +4,7 @@ import com.dan.learn.lab2.entity.FuncGroupEntity;
 import com.dan.learn.lab2.ui.activity.AccessibilityServiceLabActivity;
 import com.dan.learn.lab2.ui.activity.AnnotationActivity;
 import com.dan.learn.lab2.ui.activity.AppCustomThemeActivity;
+import com.dan.learn.lab2.ui.activity.BinderActivity;
 import com.dan.learn.lab2.ui.activity.CamerasActivity;
 import com.dan.learn.lab2.ui.activity.CanvasActivity;
 import com.dan.learn.lab2.ui.activity.CustomWidgetsActivity;
@@ -27,6 +28,7 @@ import java.util.List;
  */
 public class MainDataSet {
 
+
     public void initData() {
         MainPageRepository instance = MainPageRepository.getInstance();
         instance.clear();
@@ -41,9 +43,13 @@ public class MainDataSet {
         createAnnotation();
         createUnitTest();
         createAppTheme();
+        createBinder();
     }
 
-
+    private void createBinder() {
+        FuncGroupEntity binder = makeGroup("Binder手写");
+        binder.addChild("手写binder", "代替AIDL", BinderActivity.class);
+    }
 
     private void createViewKnowledge() {
         FuncGroupEntity view = makeGroup("View基础");

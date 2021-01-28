@@ -1,3 +1,4 @@
+include ':binderserver'
 include ':lambda'
 include ':gradlelab'
 rootProject.name='Lab2'
