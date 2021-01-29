@@ -79,9 +79,48 @@ Fragment
             - if(allowStateLoss && (mHost == null || mDestroyed)) 不再commit，否则生成临时栈容器 mTmpRecords，把当前的BackStackRecord加入栈中
             （无论 enqueueAction 还是 execSingleAction，在提交完事务以后，都会将mTmpRecords容器内容清除）
 
-
   - commit提交最终执行函数：
       - removeRedundantOperationsAndExecute(mTmpRecords, mTmpIsPop);
+
+
+
+
+问题：
+
+- 1. Fragment 中布局如何处理与布局容器的关系
+- 2. Fragment 转场动画
+- 3. Fragment 生命周期变化
+- 4. Fragment 与FragmentTransaction的关系
+- 5. Fragment 状态保存于恢复
+- 6. Fragment 怎么管理子Fragment
+- 7. Fragment 事务回退栈原理
+- 8. Fragment 与Activity的关系
+- 9. Fragment add、remove、replace、show、hide 操作实现原理
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

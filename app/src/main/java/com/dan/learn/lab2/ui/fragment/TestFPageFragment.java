@@ -1,12 +1,14 @@
 package com.dan.learn.lab2.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +81,27 @@ public class TestFPageFragment extends Fragment {
         TextView tv_fragment_text = view.findViewById(R.id.tv_fragment_text);
         tv_fragment_text.setText(mParam1);
         printFragmentLifeCycle("onViewCreated");
+
+        TextViewFragment textViewFragment = TextViewFragment.newInstance("TextView");
+        textViewFragment.setTargetFragment(this,100);
+        getView().findViewById(R.id.bt_action).setOnClickListener(v -> {
+            getChildFragmentManager().beginTransaction().add(textViewFragment, "hey").addToBackStack("stack").commit();
+        });
+        getView().findViewById(R.id.bt_action2).setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putExtra("FragmentParam", "Fragment数据");
+            getTargetFragment().onActivityResult(getTargetRequestCode(), 200, intent);
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String param = "";
+        if(data != null){
+            param = data.getStringExtra("FragmentParam");
+        }
+        Log.d("TestFPageFragment ", "onActivityResult from targetFragment requestCode：" + requestCode + " from Fragment param:" + param);
     }
 
     @Override

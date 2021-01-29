@@ -1,0 +1,107 @@
+Fragment 函数类型
+
+- Fragment关键属性
+  - FragmentManagerImpl mFragmentManager
+  - FragmentManagerImpl mChildFragmentManager
+  - FragmentHostCallback mHost                 用于回调FragmentActivity中的函数，同时用于获取一些必要资源
+  - String mWho = UUID.randomUUID().toString() 每个Fragment创建时都会单独生成该变量，是当前Fragment的唯一标识
+  - String mTag;                               Fragment的Tag
+  - boolean mRetainInstance;                   用于控制在Activity中持有Fragment的实例，尤其当Activity重建时
+  - Fragment mParentFragment;
+  - Fragment mTarget;
+
+- 生命周期函数和回调函数
+
+FragmentManagerImpl
+  moveToState(Fragment f, int newState, int transit, int transitionStyle,boolean keepActive)
+
+Fragment
+
+  - performAttach() -> onAttach(Context c) -> onAttach(Activity a)
+  - performCreate() -> onCreate(Bundle savedInstanceState)
+  - performCreateView(...) -> onCreateView(...)
+  - f.onViewCreated(f.mView, f.mSavedFragmentState)
+  - performActivityCreated() -> onActivityCreated()
+  - performStart() -> onStart()
+  - performResume() -> onResume()
+  - performPause() -> onPause()
+  - performStop() -> onStop()
+  - performDestroyView() -> onDestroyView()
+  - performDestroy() ->  onDestroy()
+  - performDetach() -> onDetach()
+
+- 调用Activity(或Context)的函数
+   - startActivity()
+   - startActivityForResult()
+   - startIntentSenderForResult()
+   - onActivityResult()
+   - requestPermissions()
+   - getContext()
+   - getActivity()
+
+- 菜单函数
+  - setHasOptionsMenu()
+  - setMenuVisibility()
+  - onCreateOptionsMenu()
+  - onPrepareOptionsMenu()
+  - onDestroyOptionsMenu()
+  - onOptionsItemSelected()
+  - onOptionsMenuClosed()
+  - onCreateContextMenu()
+  - registerForContextMenu()
+  - unregisterForContextMenu()
+  - onContextItemSelected()
+
+- Fragment状态获取函数
+  - isAdded()
+  - isDetached()
+  - isRemoving()
+  - isInLayout()
+  - isResumed()
+  - isVisible()
+  - isHidden()
+
+- Fragment 功能操作函数
+  - setShareElement()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
