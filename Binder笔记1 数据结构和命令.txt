@@ -1,0 +1,181 @@
+Binder
+
+同一个程序中函数能够调用的原因是处于相同的内存空间中，虚拟地址的映射规则完全一致。 不同的进程无法直接通过内存地址来访问到对方内部的函数或变量。
+
+Binder四层源码：
+
+ - 1. Binder native 层
+ - 2. Binder 驱动
+ - 3. Binder JNI层
+ - 4. Binder Framework层
+
+ - Activity间传递数据为什么限制是4M
+
+元素：
+
+元素一 指针：
+1. 智能指针
+2. 强指针
+3. 弱指针   弱指针必须升级为强指针才能访问它指向的目标对象，弱指针的主要作用是解决循环引用问题。
+
+
+元素二 Parcel
+
+- 1. 一种数据载体，承载能够通过Binder发送的相关信息，支持原始类型数据写入和读取，以及数组
+- 2. Parcelable 遵循Parcelable协议的对象可以通过Parcel来存取
+- 3. Bundle 继承自Parcelable，一种特殊的type-safe容器
+- 4. Active Objects Parcel写入的是对象的内容，Active Objects写入的是他们的特殊标志引用，所以从Parcel中读取这些内容实际上是原来被写入的实例
+     - Binder
+     - FileDescriptor
+
+
+
+Binder机制包含 Binder驱动、Binder native实现、Binder framework实现
+
+- 1. 驱动负责IPC通信
+- 2. Binder framework层包含 IBinder/Binder、BinderProxy、IInterface、ServiceManager..
+- 3. Binder native层主要有BBinder、BpBinder、ProcessState、IPCThreadState？
+
+主要结构分为：
+
+- Binder Driver
+- Client
+- Server
+- ServerManager
+
+
+智能指针
+
+概念：智能指针是一个对象，当有一个新的指针指向一个对象时，这个对象的引用计数+1；相反则减1.
+
+分类：
+
+1. 轻量级指针
+2. 强引用指针
+3. 弱引用指针
+
+
+Binder机制的数据结构
+
+1. struct binder_work  描述待处理工作项
+          - struct list_head_entry  用来将binder_work结构体嵌入到一个宿主结构中
+          - enum type  描述工作项的类型
+
+2. struct binder_note  描述一个Binder实体对象
+          - struct binder_proc *proc 表示一个Binder实体对象的宿主进程
+          - struct binder_work
+          - _user *ptr 和 ——user *cookie 分别指向一个用户空间地址，用来描述用户空间中的一个Service组件。
+                       cookie指向该Service组件的地址，ptr指向该Service组件内部的一个引用技术对象的地址。
+          - ..
+
+3. struct binder_ref_death 描述一个Service组件的死亡接收通知
+          - struct binder_worker work  表示具体的死亡通知类型
+          - void _user *cookie 表示一个保存接收死亡通知的对象的地址
+
+4. struct binder_ref 描述一个Binder的引用对象
+          - struct binder_note *node 表示一个Binder引用对象所引用的Binder实体对象
+          - uint_32_t desc 句柄值(描述符)，描述一个Binder引用对象。在Client进程的用户空间中，一个Binder引用对象是用一个句柄值描述的，
+                            当Client进程通过Binder驱动访问一个Service组件时，它只需要指定一个句柄值，Binder驱动就可以通过句柄值找到对应
+                            的Binder引用对象，然后根据Binder引用对象的成员变量node找到对应的Binder实体对象，然后根据Binder实体对象找到
+                            Service组件。
+
+5. struct binder_buffer 描述一个内核缓冲区，用来在进程间传递数据使用
+          - struct binder_node *target_node   内核缓冲区正在交给哪一个Binder实体对象使用
+          - struct binder_transaction *transaction  内核缓冲区正在交给哪一个事务，每一个事务关联一个Binder实体对象
+          - uint8_t data[0] 指向一块大小可变的数据缓冲区，保存通信数据。数据缓冲区的数据划分为两种类型，普通数据和Binder。Binder驱动不关心普通数据，
+          但是必须知道里面的Binder，因为驱动要根据它们维护内核中Binder实体对象和引用对象的生命周期
+          - size_t data_size 表示数据缓冲区大小
+          - size_t offsets_size 偏移数组，记录了数据缓冲区中每一个Binder对象的在数据缓冲区中的位置
+
+6. struct binder_proc 描述一个正在试用Binder进程间通信的机制的进程，比如该进程的内存分配和线程管理信息
+
+7. struct binder_thread 描述Binder线程池中的一个线程
+          - struct binder_proc *proc 指向其宿主进程
+
+8. struct binder_transaction 描述进程间通信的过程，又称为一个事务。
+          - unsigned need_reply : 1 区分事务是异步的还是同步的，同步事务需要等待对方回复，值为1；否则为0，不需等待回复
+          - priority / sender_euid 源线程的优先级/用户ID,通过这两个变量，目标进程和目标线程可以识别事务发起方身份
+
+9. struct binder_write_read  表示进程间通信过程中传输的数据
+          - signed long write_size /write_consumed/write_buffer 表示输入数据，用户空间 -> Binder驱动程序
+          - signed long read_size / read_consume/read_buffer 输出数据，Binder驱动程序返回给用户空间的数据
+          - unsigned long write_buffer 指向一个用户空间缓冲区地址，里面的内容即为要传输到Binder驱动的数据。大小由write_size决定，
+                                       单位字节，
+          - unsigned long write_consumed 描述Binder驱动从缓冲区write_buffer中处理了多少字节数据
+          - unsigned long read_buffer 指向一个用户空间缓冲区地址，里面存储内容是Binder驱动返回给用户空间进程通信
+                                      的结果数据。
+          - unsigned long read_consumed 表示用户空间程序从缓冲区read_buffer中处理了多少字节的数据
+
+
+10.Binder ioctl 命令
+
+- binder_ioctl 实现了应用进程和Binder驱动之间的命令交互
+
+binder_ioctl支持的命令：
+
+- BINDER_WRITE_READ      读写操作，此命令向Binder驱动写入或读取数据
+- BINDER_SET_MAX_THREADS 设置支持的最大线程数。因为客户端可以并发访问服务端，如果Binder驱动发现当前线程数量
+                         已经超过设定值，就会告知Binder Server停止启动新线程
+- BINDER_SET_CONTEXT_MGR ServiceManager专用，设置为Binder大管家，系统只能存在一个ServiceManager
+- BINDER_THREAD_EXIT     通知Binder驱动线程退出。每个线程退出时都需要告知Binder驱动
+- BINDER_VERSION         获取Binder版本号
+
+
+
+BINDER_WRITE_READ 支持的子命令
+
+- 操作引用计数命令
+  - BC_INCREFS/BC_ACQUIRE/BC_RELEASE/BC_DECEEFS
+
+- 引用计数完成命令
+  - BC_INCREFS_DONE、BC_ACQUIRE_DONE
+
+- 管理Binder中buffer命令
+  - BC_FREE_BUFFER
+
+- 关键命令 （客户与服务器交互的主要命令）
+  - BC_TRANSACTION
+  - BC_REPLY
+
+- Binder Looper命令 （设置Looper的状态）
+  - BC_REGISTER_LOOPER
+  - BC_ENTER_LOOPER
+  - BC_EXIT_LOOPER
+
+- DEATH操作命令
+  - BC_REQUEST_DEATH_NOTIFICATION  通知目标对象指向DEATH操作
+  - BC_CLEAR_DEATH_NOTIFICATION    清除DEATH通知
+
+- BC_DEAD_BINDER_DONE
+
+
+
+与Binder驱动通信
+
+- 1. 使用binder_open()打开 /dev/binder节点
+     - Binder驱动会在/proc目录下生产各种管理信息以及管理信息的记录体 binder_proc
+     - 初始化binder_proc对象，然后将其嵌入到Binder全局管理中
+     - Binder驱动已为用户创建了binder_proc实体，后续对Binder设备的操作将以该对象为基础
+
+- 2. mmap() 内存映射
+     - mmap()对应的是binder_mmap()，mmap()可以把设备指定的物理内存块直接映射到应用程序的内存空间中
+     - 对于应用程序来说，通过mmap()返回值得到一个内存地址(虚拟地址),通过虚拟内存转换(分页、分段)最终指向物理内存地址
+     - 对于Binder驱动，同样会有一个指针(binder_proc->buffer) 指向某个虚拟内存地址。经过虚拟内存转换，会和应用程序
+       中指向的物理内存处于同一个地址
+
+- 3. 针对Client
+     - Client进程与Binder驱动通信时，Binder驱动通过copy_from_user()，把client进程某段数据复制到binder_proc->buffer
+        所指向的内存空间中。而binder_proc -> buffer指向的内存与server进程是共享的，所以经过一次拷贝就实现了进程间通信
+
+
+binder_mmap()
+ - vm_area_struct *vma 描述了一块应用程序使用的虚拟内存
+ - vm_struct *area Binder驱动中对虚拟内存的描述
+ - binder_proc *proc Binder驱动为应用进程分配的一个数据结构，存储该进程相关的所有信息(内存分配、线程管理)
+ - 4MB 应用程序进程申请的内存至多为4MB，超过该大小限制时不会报错，而是只给到4MB的请求
+ - proc -> buffer 用于存储mmap()结果(属于Binder的那个虚拟内存)
+ - area = get_vm_area() 为Binder驱动获取一段可用的虚拟内存空间(尚未分配实际的物理内存)
+ - proc->buffer = area->addr.. 将proc中buffer指针指向这块虚拟内存的起始地址，并计算它和应用程序中关联的
+                               虚拟内存地址(vma->vm_start)的偏移量
+ - proc->pages = kzalloc(..)  分配pages数组空间，pages指示Binder申请的物理页面的状态
+ - binder_update_page_range() 开始真正的申请物理页面地

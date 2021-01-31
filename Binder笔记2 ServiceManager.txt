@@ -1,0 +1,128 @@
+1. ServiceManager 构建
+
+1. 设备启动时，init程序加载解析init.rc文件时启动ServiceManager，若servicemanager服务发生问题重启，相应的zygote、media、surfacefinger
+   都要重新加载
+2. servicemanager由C++编写实现，对应源码是service_manager.c和binder.c
+
+3. ServiceManager中维护了一个svclist变量用于存储所有的Server注册信息
+
+ServiceManager（service_manager.c）构建过程
+
+位于service_manager的main函数
+
+- binder_open() 打开Binder设备
+  - open("/dev/binder")  打开Binder设备
+  - mmap() 映射一块设备内存到进程空间中
+
+- binder_become_context_manager(bs)
+  - ioctl(bs->fd,BINDER_SET_CONTEXT_MGR) 发送此命令将自己设置为大管家
+
+- binder_loop(bs,svcmgr_handler) 启动循环开始等待客户请求
+  - binder_write(readbuf[0]=BC_ENTER_LOOP..) 首先要告诉Binder驱动进入循环这一状态变化
+  - for(;;)进入大循环
+     - ioctl(bs,0,BINDER_WRITE_READ,&bwr) 从消息队列中读取消息，因为read_size=sizeof(readbuf)，而write_size为0，
+     - 读取的消息存储在bwr.read_buffer中，如果命令是退出则马上结束循环,如果消息为空，则继续读取消息；非空消息则根据具体情况执行不同操作
+     - binder_parse()解析消息执行
+         binder_parse()函数内部将进入一个while循环，遍历消息执行直到本次取出的消息执行完毕，本次消息执行完之后会进入下一轮循环，本次取出的消息
+         执行完毕以后，则向Binder驱动发送BINDER_WRITE_READ命令继续从驱动中读取新的消息
+       - 消息的头部是cmd命令，解析函数会根据具体命令执行相应的操作
+
+       - BR_NOOP/BR_TRANSACTION_COMPLETE、BR_INCREFS/BR_ACQUIRE(引用计数命令)不需特别处理
+
+       - BR_TRANSACTION 执行Service的注册、查询、其他信息查询等相关操作
+             - 根据命令(SVC_MGR_GET_SERVICE/SVC_MGR_CHECK_SERVICE/SVC_MGR_ADD_SERVICE/SVC_MGR_LIST_SERVICE)指向注册查询BinderServer
+             - 对应函数：
+                 - do_find_service() 内部遍历查找，返回指定的Server对象，最后将结果存入reply中
+                 - do_add_service()  注册Binder Server,首先从SM维护的数据列表中查找Server节点是否存在；否则创建新的节点记录Server；
+                                     最后将Server信息插入到列表相应的节点中。
+                 - svc_handler 处理完成以后，binder_parse会进一步通过binder_send_reply()函数将执行结果回复给Binder底层驱动，进而传递给
+                               client进程，然后binder_parse进入下一轮while循环，直到从驱动层读取的消息都执行完毕，然后继续向Binder驱动发送BINDER_WRITE_READ命令以查询是否有新的消息。
+
+       - BR_REPLY
+          该命令并没有实质性的行动。
+
+
+
+2. ServiceManager服务的获取
+
+- 每个进程只允许打开一次Binder驱动，且只做一次内存映射，所有需要使用Binder驱动的线程共享这一资源。
+
+关键角色和流程：
+
+1. ProcessState 专门管理进程中的Binder操作，（其中封装了一系列对上层用户透明的Binder操作？）
+2. IPCThreadState 每个线程都有雨Binder通信的权利，IPCThreadState是真正用来和Binder驱动通信的，保证每个线程与Binder的通信
+3. IServiceManager 接口定义了ServiceManager关于操作服务的相关函数，由ServiceManagerProxy实现
+4. ServiceManagerProxy 是native层ServiceManager服务的代理，实现了IServiceManager接口，内部通过ServiceManagerNative获取实例
+   ServiceManagerProxy(IBinder remote) 中参数remote用来和底层Binder进行通信
+5. ServiceManager 是对ServiceManagerProxy的一层封装，使得获取SM服务更加方便
+6. ServiceManagerNative asInterface(IBinder obj) 获取ServiceManagerProxy实例，如果通过obj.queryLocalInterface()查询本地已经
+                        有了IServiceManager对象存在，则转换后返回；否则new ServiceManagerProxy(obj)返回
+
+7. getService(String name) 创建ServiceManagerProxy实例后要与底层Binder进行通信，步骤如下：
+     - 准备数据，通过Parcel打包
+     - 调用（mRemote）IBinder.transact()将请求发送出去，而mRemote内部肯定会使用ProcessState和IPCThreadState
+     - 调用transact()后获取结果（IPC是阻塞式的，获取结果后要唤醒挂起的线程）
+8. 进程中使用ProcessState和IPCThreadState这两个角色与Binder驱动联系，ProcessState和IPCThreadState内部使用open()/mmap()/ioctl()等函数。
+
+9. 在构建ServiceManager对象时，会传入一个IBinder对象，由BinderInternal.getContextObject() native方法获取，具体获取由JNI层的
+   BinderInternal实现
+10. native层BinderInternal.getContextObject()函数内部调用了ProccessState::self()创建了ProcessState实例对象，
+    再由ProcessState->getContextObject()构建了native层的IBinder对象
+11. ProcessState构建的native层IBinder对象叫BpBinder，又通过javaObjectForIBinder()函数将对象转化为Java层的IBinder对象BinderProxy
+12. BinderProxy和BpBinder分别继承自Java层和native层的IBinder接口，BpBinder有ProcessState创建，BinderProxy由javaObjectForIbinder
+    函数的NewObject()创建，BinderProxy中的transact()函数是一个native接口，真正的实现在android_util_Binder.cpp中
+
+
+13. ProcessState 和 IPCThreadState
+
+  ProcessState：
+
+    - 同一个进程只有一个ProcessState实例存在，只有在ProcessState对象创建时才打开Binder设备以及做内存映射
+    - 向上层提供IPC服务
+    - 与IPCThreadState分工合作
+
+   1. ProcessState的构造函数中调用了open_driver()打开/dev/binder节点，然后执行了mmap()映射
+   2. getContextObject() -> getStrongProxyProxyForHandler(0) //传入0，表示是ServiceManager
+      getStrongProxyProxyForHandler(handle)
+        - 从Vector表中(这个进程已经建立的Binder相关信息)查找相应的节点，没有就自动添加一个
+          b = new BpBinder(handle)
+        - 每个表项是 struct handle_entry结构，包含IBinder *binder和RefBase::weakref_type * refs;  binder对象即为BpBinder
+
+  BpBinder:
+
+   - BpBinder继承了引用计数基类RefBase,支持强弱两种引用计数
+   - BpBinder的构造函数中创建了IPCThreadState对象：
+             IPCThreadState::self() -> incWeakHandler(handler)
+   - IPCThreadState 是线程单实例，为了实现单实例，采用了Thread Local Storage(TLS)机制，类似于Java中的ThradLocal
+   - BpBinder构造函数最后调用了IPCThreadState的incWeakHandler()用于增加Binder Service的弱引用计数值，实际上是向Binder
+     驱动发送了BC_INCREFS命令
+
+  IPCThreadState
+
+   IPCThreadState负责与Binder驱动的具体命令交互，ProcessState只负责打开Binder驱动并做mmap()
+
+   IPCThreadState的transact()函数
+
+     以ServiceManager.getService()为例，调用流程如下：
+
+     getService()@ServiceManagerProxy->transact@BinderProxy->transact@BpBinder->transact@IPCThreadState
+
+     Transaction有四种flag:
+      - TF_ONE_WAY 表示业务是异步的，不需等待
+      - TF_ROOT_OBJECT 所包含的内容是根对象
+      - TF_STATUS_CODE 包含的内容是32-bit的状态值
+      - TF_ACCEPT_FDS = 0x10 允许回复中包含文件描述符
+
+     调用transact函数，需要完成以下步骤：
+      1. 整理数据，打包成Binder驱动协议规定的格式，由writeTransactionData()完成，并将数据写入到mOut中
+      2. waitForResponse() - 对数据再进一步包装，while循环中不断调用talkWithDriver()与Binder驱动进行沟通
+                           - talkWithDriver()执行后，执行mIn.errorCheck()表示已经收到Binder驱动回复
+                           - mIn.dataAvail() == 0，若没有数据继续循环
+                           - mIn.readInt32()读取回复数据
+      3. talkWithDriver()  负责与Binder驱动通信，主要调用了ioctl()函数
+         - 执行完ioctl后，根据bwr.write_consumed和bwr.read_consumed可以知道Binder驱动对
+           BINDER_TRANSACTION_WRITE_READ的执行情况。
+           - write_consumed > 0 表示Binder驱动消耗了mOut中的数据，需要把该部分处理过的数据移除掉
+           - read_consumed > 0 表示Binder驱动成功取到了数据并且写入到了mIn.data指向的内存地址，接下来需要设置mDataSize、mDataPos
+             为合适的值
+
