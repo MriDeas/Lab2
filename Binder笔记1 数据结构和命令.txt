@@ -34,14 +34,14 @@ Binder机制包含 Binder驱动、Binder native实现、Binder framework实现
 
 - 1. 驱动负责IPC通信
 - 2. Binder framework层包含 IBinder/Binder、BinderProxy、IInterface、ServiceManager..
-- 3. Binder native层主要有BBinder、BpBinder、ProcessState、IPCThreadState？
+- 3. Binder native层主要有BBinder、BpBinder、ProcessState、IPCThreadState
 
 主要结构分为：
 
 - Binder Driver
 - Client
 - Server
-- ServerManager
+- ServiceManager
 
 
 智能指针
@@ -64,7 +64,7 @@ Binder机制的数据结构
 2. struct binder_note  描述一个Binder实体对象
           - struct binder_proc *proc 表示一个Binder实体对象的宿主进程
           - struct binder_work
-          - _user *ptr 和 ——user *cookie 分别指向一个用户空间地址，用来描述用户空间中的一个Service组件。
+          - _user *ptr 和 _user *cookie 分别指向一个用户空间地址，用来描述用户空间中的一个Service组件。
                        cookie指向该Service组件的地址，ptr指向该Service组件内部的一个引用技术对象的地址。
           - ..
 
@@ -73,7 +73,7 @@ Binder机制的数据结构
           - void _user *cookie 表示一个保存接收死亡通知的对象的地址
 
 4. struct binder_ref 描述一个Binder的引用对象
-          - struct binder_note *node 表示一个Binder引用对象所引用的Binder实体对象
+          - struct binder_node *node 表示一个Binder引用对象所引用的Binder实体对象
           - uint_32_t desc 句柄值(描述符)，描述一个Binder引用对象。在Client进程的用户空间中，一个Binder引用对象是用一个句柄值描述的，
                             当Client进程通过Binder驱动访问一个Service组件时，它只需要指定一个句柄值，Binder驱动就可以通过句柄值找到对应
                             的Binder引用对象，然后根据Binder引用对象的成员变量node找到对应的Binder实体对象，然后根据Binder实体对象找到
@@ -87,7 +87,7 @@ Binder机制的数据结构
           - size_t data_size 表示数据缓冲区大小
           - size_t offsets_size 偏移数组，记录了数据缓冲区中每一个Binder对象的在数据缓冲区中的位置
 
-6. struct binder_proc 描述一个正在试用Binder进程间通信的机制的进程，比如该进程的内存分配和线程管理信息
+6. struct binder_proc 描述一个正在使用Binder进程间通信的机制的进程，比如该进程的内存分配和线程管理信息
 
 7. struct binder_thread 描述Binder线程池中的一个线程
           - struct binder_proc *proc 指向其宿主进程
@@ -178,4 +178,4 @@ binder_mmap()
  - proc->buffer = area->addr.. 将proc中buffer指针指向这块虚拟内存的起始地址，并计算它和应用程序中关联的
                                虚拟内存地址(vma->vm_start)的偏移量
  - proc->pages = kzalloc(..)  分配pages数组空间，pages指示Binder申请的物理页面的状态
- - binder_update_page_range() 开始真正的申请物理页面地
+ - binder_update_page_range() 开始真正的申请物理页面地址
