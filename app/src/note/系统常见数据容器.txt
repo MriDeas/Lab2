@@ -1,0 +1,21 @@
+
+- 顶级接口 Collection
+- 迭代器接口 Iterable 凡是支持遍历迭代的容器都需要实现该接口向外提供迭代器
+
+- List
+  - ArrayList
+  - LinkedList
+  - Vector
+
+- Array
+
+- Set
+ - HashSet
+ - LinkedHashSet
+ - TreeSet
+
+- Map
+  - HashMap
+  - TreeMap
+  - SortedMap
+  - HashTable
