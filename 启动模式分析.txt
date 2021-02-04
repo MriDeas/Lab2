@@ -1,0 +1,96 @@
+按下Home键发生了什么
+
+- 点击任务键可以使得可以在多个Task之间切换，每个Task都要独立的回退栈。
+
+- 回退栈：按顺序记录每个用户打开的Activity，当栈中最后一个Activity销毁，Task的生命结束，但是不会在最近任务列表中消失
+
+- 最近任务中的Task未必是活着的，看不见的Task未必被销毁
+
+- 当从A应用打开B应用的Activity时，B应用的Activity会被放入A应用的Task里，对于B应用的Task则没有影响，被打开的B应用的Activity只和打开它的应用的Task相关
+
+- Task 由前台进入后台
+
+  - 按Home键返回桌面
+  - 按最近任务键，查看最近任务列表
+    - 前台Task在最近任务列表显示出来的时候就已经进入后台，而不是在切换到其他应用之后
+
+ 举例：
+
+ 短信 -> 邮箱 -> 查看最近任务，切回邮件（前台Task仅剩一个），此时点击返回键 -> 回到桌面
+
+
+ 除singleTask启动模式之外，使用allowTaskReparenting属性设置为true：
+   - 用户从短信打开邮件Activity，会进入短信APP的Task
+   - 用户从桌面点开邮件APP时 -> 放在短信Task里的邮件APP的Activity会被挪过来，
+     放进邮件APP的Task，在回退栈顶端显示出来 -> 切回短信，之前邮件APP的Activity已消失
+
+- singleTask 除了保证Activity在固定的Task中创建，如果启动时，这个Task栈中已经有了
+  这个Activity，不会创建新的对象，直接复用这个已有的对象，不会走onCreate函数，而是回调
+  onNewIntent()函数，如果这个Activity上面还有其他Activity，那么在回调onNewIntent()
+  之前，系统会清理这些Activity，确保这个Activity处于栈顶
+
+  - 限制了它修饰的Activity在全局仅有一个对象
+
+- singleInstance
+  - 要求Activity所在的Task里只有一个Activity
+     - 创建单独的Task将Activity放进Task栈中
+     - 如果之前已经创建过这个Task和Activity，则复用，和singleTask一样，复用Activity，回调它的onNewIntent
+     - 如果在singleInstance修饰的Activity中打开另一个Activity，新的Activity不会在当前
+       Task中，而是装在另外的Task中压在最上面的
+
+- singleTask 和 singleInstance
+  - singleTask强调唯一性，仅在一个Task中出现，而且这个Task中也只有一个Activity实例
+  - singleInstance除了唯一性，还要求独占性，独占一个Task
+  - 实际操作时，
+      用户按返回键：
+      singleTask：在自己的APP里回退；
+      singleInstance：回到原先的APP
+
+      用户稍后从桌面点开Activity所在的APP：
+      - singleTask：看到Activity依然在栈顶
+      - singleInstance：看到Activity已经不见，蹲守在后台，当再次启动时复用
+
+
+- taskAffinity
+  - android 系统要求一个APP最多只有一个Task可以显示在最近的任务列表里，依据是
+  taskAffinity,每个Activity都有一个taskAffinity，类似于对Activity的分组，
+  默认取值是Activity所在的Application的taskAffinity的值，Application的
+  taskAffiliate默认取值是应用包名。
+
+  - 每个Task也有一个taskAffinity，取值默认是栈底的Activity的taskAffinity
+
+  - 对于设置launchMode="singleTask"模式的Activity，系统先比对Activity和当前Task
+    的taskAffinity是否相同，如果相同依然正常入栈，如果不同，新的Activity会进入和它的
+    taskAffinity相同的Task后入栈，或者创建新的Task然后入栈
+
+  - 查看最近任务时，展示所有的Task，但它们的taskAffinity需要不一样；单个APP可以拥有
+    多个taskAffinity，但是至多有一个显示在最近任务列表里
+
+- singleTop
+   - 和默认的standard一样，启动时不考虑taskAffinity，将创建的Activity加入当前
+     Task的栈顶，若栈顶Activity就是要启动的Activity，那直接复用
+
+
+- 总结
+  - standard 和 singleTop，多用于APP内部
+  - singleInstance，多用于开放给外部来共享使用
+  - singleTask 内部交互和外部交互都会用得上
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
