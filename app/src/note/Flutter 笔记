@@ -1,0 +1,165 @@
+
+前端框架中常见的名词，比如视图（View）、视图控制器（View Controller）、活动（Activity）、应用（Application）、布局（Layout）等，在 Flutter 中都是 Widget。
+
+1. Widget 渲染过程
+
+   三个重要元素： Widget  - Element - RenderObject
+
+   1.1 Widget
+
+       Widget 是 Flutter 世界里对视图的一种结构化描述,是控件实现的基本逻辑单位,里面存储的是有关视图渲染的配置信息，包括布局、渲染属性、事件响应信息等.
+
+       - Widget 不可变,当视图渲染的配置信息发生变化,Flutter 会选择重建 Widget 树的方式进行数据更新.
+       - Widget 本身并不涉及实际渲染位图,只是一份轻量级的数据结构，重建的成本很低。
+       - 由于 Widget 的不可变性，可以以较低成本进行渲染节点复用，因此在一个真实的渲染树中可能存在不同的 Widget 对应同一个渲染节点的情况
+
+   1.2 Element
+
+       Element 是 Widget 的一个实例化对象，它承载了视图构建的上下文数据，是连接结构化的配置信息到完成最终渲染的桥梁.
+
+       渲染过程：
+
+       - 首先，通过 Widget 树生成对应的 Element 树；
+       - 然后，创建相应的 RenderObject 并关联到 Element.renderObject 属性上；
+       - 最后，构建成 RenderObject 树，以完成最终的渲染。
+
+       Element 同时持有 Widget 和 RenderObject。而无论是 Widget 还是 Element，其实都不负责最后的渲染，只负责发号施令。
+       Element 树这一层将 Widget 树的变化（类似 React 虚拟 DOM diff）做了抽象，可以只将真正需要修改的部分同步到真实的 RenderObject 树中，最大程度降低对真实渲染视图的修改。
+
+  1.3 RenderObject
+
+      RenderObject 是主要负责实现视图渲染的对象。
+
+      渲染对象树在 Flutter 的展示过程分为四个阶段，即布局、绘制、合成和渲染。 其中，布局和绘制在 RenderObject 中完成，Flutter 采用深度优先机制遍历渲染对象树，确定树中各个对象的位置和尺寸，并把它们绘制到不同的图层上。绘制完毕后，合成和渲染的工作则交给 Skia 搞定。
+
+      Flutter 通过引入 Widget、Element 与 RenderObject 这三个概念，把原本从视图数据到视图渲染的复杂构建过程拆分得更简单、直接，
+      在易于集中治理的同时，保证了较高的渲染效率。
+
+
+  1.4 RenderObjectWidget
+
+      RenderObjectWidget 本身并不负责这些对象（Element 和 RenderObject）的创建与更新。
+
+      Element创建：Flutter 会在遍历 Widget 树时，调用 createElement 去同步 Widget 自身配置，从而生成对应节点的 Element 对象。
+
+      RenderObject 的创建与更新：是在 RenderObjectElement 类中完成的。
+
+      Element 创建完毕后，Flutter 会调用 Element 的 mount 方法。在这个方法里，会完成与之关联的 RenderObject 对象的创建，以及与渲染树的插入工作，插入到渲染树后的 Element 就可以显示到屏幕中。
+
+      如果 Widget 的配置数据发生了改变，那么持有该 Widget 的 Element 节点也会被标记为 dirty。在下一个周期的绘制时，Flutter 就会触发 Element 树的更新，并使用最新的 Widget 数据更新自身以及关联的 RenderObject 对象，接下来便会进入 Layout 和 Paint 的流程。而真正的绘制和布局过程，则完全交由 RenderObject 完成。
+
+      布局和绘制完成后，接下来的事情就交给 Skia 了。在 VSync 信号同步时直接从渲染树合成 Bitmap，然后提交给 GPU。
+
+
+      了解课程：https://time.geekbang.org/column/article/108522
+
+
+2. StatelessWidget 和 StatefulWidget
+
+   2.1 StatelessWidget
+       当你所要构建的用户界面不随任何状态信息的变化而变化时，需要选择使用 StatelessWidget，反之则选用 StatefulWidget。
+
+       在 Flutter 中，Widget 采用由父到子、自顶向下的方式进行构建，父 Widget 控制着子 Widget 的显示样式，其样式配置由父 Widget 在构建时提供。
+       用这种方式构建出的 Widget，有些（比如 Text、Container、Row、Column 等）在创建时，除了这些配置参数之外不依赖于任何其他信息，
+       一旦创建成功就不再关心、也不响应任何数据变化进行重绘。在 Flutter 中，这样的 Widget 被称为 StatelessWidget（无状态组件）。
+
+
+      试用场景：父 Widget 是否能通过初始化参数完全控制其 UI 展示效果？如果能，那么我们就可以使用 StatelessWidget 来设计构造函数接口。
+
+  2.2 StatefulWidget
+
+      一些 Widget 创建完成后，还需要关心和响应数据变化来进行重绘。在 Flutter 中，这一类 Widget 被称为 StatefulWidget（有状态组件）。
+
+
+      两者使用上的注意：
+      Widget 是不可变的，更新则意味着销毁 + 重建（build）。StatelessWidget 是静态的，一旦创建则无需更新；而对于 StatefulWidget 来说，在 State 类中调用 setState 方法更新数据，会触发视图的销毁和重建，也将间接地触发其每个子 Widget 的销毁和重建。
+
+
+
+
+3. 生命周期
+
+   3.1 State 的生命周期
+       State的生命周期回调分为三个阶段：创建（插入视图树）、更新（在视图树中存在）、销毁（从视图树中移除
+         - 初始化
+             - Start
+             - 构造方法
+             - initState
+         - 更新 (didUpdateWidget  setState)
+             - didChangeDependencies
+             - build
+             - tree
+         - 销毁
+             - dactive
+             - dispose
+             - end
+
+         1. 创建阶段
+            - 构造方法是 State 生命周期的起点，Flutter 会通过调用 StatefulWidget.createState() 来创建一个 State
+            - initState，会在 State 对象被插入视图树的时候调用
+            - didChangeDependencies 则用来专门处理 State 对象依赖关系变化，会在 initState() 调用结束后，被 Flutter 调用
+            - build，作用是构建视图
+         2. 更新
+            - 状态更新由三个方法触发：setState/didChangeDependencies/didUpdateWidget
+
+            - setState 当状态数据发生变化时，我们总是通过调用这个方法告诉 Flutter
+            - didChangeDependencies  State 对象的依赖关系发生变化后，Flutter 会回调这个方法，随后触发组件构建（如系统语言变化）
+            - didUpdateWidget 当 Widget 的配置发生变化时，比如，父 Widget 触发重建，热重载时，系统会调用这个函数
+         3. 销毁
+            组件被移除，或是页面销毁的时候，系统会调用 deactivate 和 dispose 这两个方法，来移除或销毁组件。
+
+            - 当组件的可见状态发生变化时，deactivate 函数会被调用，这时 State 会被暂时从视图树中移除
+            - 当 State 被永久地从视图树中移除时，Flutter 会调用 dispose 函数，而一旦到这个阶段，组件就要被销毁了
+
+   3.2 APP的生命周期
+       App 的生命周期，则定义了 App 从启动到退出的全过程
+
+       有时我们需要在对应的 App 生命周期事件中做相应处理，比如 App 从后台进入前台、从前台退到后台，或是在 UI 绘制完成后做一些处理，
+       我们可以利用 WidgetsBindingObserver 类，来实现。
+
+        WidgetsBindingObserver回调函数：
+        //页面pop
+        Future didPopRoute() => Future.value(false);
+        //页面push Future
+        didPushRoute(String route) => Future.value(false);
+        //系统窗口相关改变回调，如旋转
+        void didChangeMetrics() { }
+        //文本缩放系数变化
+        void didChangeTextScaleFactor() { }
+        //系统亮度变化
+        void didChangePlatformBrightness() { }
+        //本地化语言变化
+        void didChangeLocales(List locale) { }
+        //App生命周期变化
+        void didChangeAppLifecycleState(AppLifecycleState state) { }
+        //内存警告回调
+        void didHaveMemoryPressure() { }
+        //Accessibility相关特性回调
+        void didChangeAccessibilityFeatures() {}
+
+   3.3 应用生命周期回调（didChangeAppLifecycleState）
+
+       didChangeAppLifecycleState 回调函数中，有一个参数类型为 AppLifecycleState 的枚举类，这个枚举类是 Flutter 对 App 生命周期状态的封装。它的常用状态包括 resumed、inactive、paused 这三个。
+
+        - resumed：可见的，并能响应用户的输入
+        - inactive：处在不活动状态，无法处理用户响应
+        - paused：不可见并不能响应用户的输入，但是在后台继续活动中
+
+     注册生命周期监听器：
+        void initState(){
+          WidgetsBinding.instance.addObserver(this)
+        }
+
+        void dispose(){
+        WidgetsBinding.instance.removeObserver(this);
+        }
+
+        void didChangeAppLifecycleState(AppLifecycleState state){ //生命周期变化
+
+        }
+
+   3.4 帧绘制回调
+       WidgetsBinding 提供了单次 Frame 绘制回调，以及实时 Frame 绘制回调两种机制，来分别满足不同的需求：
+
+       - 单次 Frame 绘制回调，通过 addPostFrameCallback 实现
+       - 实时 Frame 绘制回调，则通过 addPersistentFrameCallback 实现
