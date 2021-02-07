@@ -1,0 +1,110 @@
+进程 -> 程序运行实例
+线程 -> CPU调度的基本单位
+
+1.
+- 启动一个Activity需要多少个线程：
+    - main_thread
+    - thread Binder_1
+    - thread Binder_2
+- Zygote 为Activity/Service创建的主线程是 ActivityThread
+
+2.
+- Handler和MessageQueue
+
+2.1 Handler
+
+  - 每个Thread对应一个Looper
+  - 每个Looper只对应一个MessageQueue
+  - 每个MessageQueue中有N个Message
+  - 每个Message只对应一个Handler来处理消息
+
+  Handler消息的处理
+    - 1. Message.Callback
+    - 2. Handler.Callback
+    - 3. Handler.handleMessage
+
+  Handler.send/post消息
+    - send 直接处理Message
+    - post 需要把其他类型零散的消息转换为Message再调用send
+
+2.2 MessageQueue
+    - MessageQueue是一个消息队列，新建队列时由其构造函数和nativeInit()构成，本地函数创建一个NativeMessageQueue赋值给成员变量
+    - nativeDestroy()本地函数销毁队列
+
+2.3 Looper
+
+    Looper负责源源不断地从MessageQueue中取出消息
+
+    - Looper中重要的成员变量sThreadLocal，Looper创建后会被存入该容器，作为仅有当前线程持有的变量，外部不可访问
+    - Looper中持有消息队列实例
+
+Handler与Looper、MessageQueue建立联系的过程：
+
+- Handler在构建时需要指定一个Looper对象，默认会在Handler构造函数中由Looper.myLooper()获取当前线程中的Looper，
+- 通过获取的Looper对象再获得MessageQueue对象
+
+
+3. 线程类Thread和线程
+
+  线程是操作系统CPU资源分配的调度单元，属于抽象范畴；线程类本质是可执行代码。
+
+  Java中线程类主要是Thread和Runnable接口，使用线程有两种方式：
+   - MyThread mt = new MyThread()
+     mt.start()
+   - new Thread(Runable target).start();
+
+  两种方法最终调用start函数启动线程，其中：
+   - VMThread.create(this,stackSize); //真正创建一个CPU线程，在线程中运行的只有run函数
+
+  Thread类仅是一个中介，任务是启动一个线程来运行用户指定的Runnable。
+
+  - 线程的几种状态：
+
+    - NEW
+    - RUNNABLE
+    - BLOCKING
+    - TIMED_WAITING
+    - TERMINATED
+
+  - object.wait/notify/notifyAll
+    - 当某个线程调用一个Object的wait函数时，系统会在这个Object中记录这个请求，因为可能不止一个请求，所以使用列表
+    - 当后期唤醒条件满足，可以使用object.nofity/notifyAll唤醒需要唤醒的线程
+    - 调用者只有成为Object的monitor后，才能调用它的wait函数
+
+    成为一个对象的monitor有三种途径：
+     - 执行这个object的synchronized方法
+     - 执行一段synchronized代码，并且是基于这个object做的同步
+     - 如果object是Class类，可以执行它的synchronized static方法
+
+  - interrupt（中断线程执行）
+    - 如果Thread正被blocked在某object的wait上，或者join/sleep方法中，线程会被唤醒，中断状态会被清除并接收到InterruptException
+    - 如果线程被blocked在InterruptChannel的I/O操作中，那么中断状态会被值位，并接收到ClosedByInterruptException
+    - 如果线程被blocked在Selector中，中断状态会被置为并马上返回，不会抛出异常
+
+  - join
+    - Thread t1 ...
+      Thread t2 ...
+
+      t1.start
+      t1.join
+      t2.start
+
+      - 只有当t1线程执行完毕，才能执行t2线程，从而保证两个线程按顺序执行
+      - 含时间参数的join函数，限制t1线程任务在某段时间内，时间过期后没有执行完毕，则继续执行后面的语句
+
+   - sleep
+     类似于wait，但是wait等待的是某个object，而sleep等待的则是时间
+
+
+
+
+
+
+
+
+
+
+
+
+
+

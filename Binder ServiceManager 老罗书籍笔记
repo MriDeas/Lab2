@@ -1,0 +1,15 @@
+ServiceManager启动过程：
+
+- ServiceManager由init进程负责，init进程在系统启动之初时启动，ServiceManager会在系统启动之初以系统服务身份且是关键服务的形式启动。
+- 启动过程分为三步：
+   - binder_open 打开设备/dev/binder文件
+   - 调用binder_become_contect_manager成为进程间通信的管理者
+   - 调用binder_loop函数循环等待和处理Client进程的请求
+
+- binder_state结构体
+   - int fd
+   - void *mmaped
+   - unsinged mapsize
+
+ - SM打卡/dev/binder设备后会将得到的文件描述符保存在结构体binder_state中的fd，以便后续和Binder驱动交互
+ - 映射后得到的地址空间大小和地址保存在binder_state的mapsize和mmaped中

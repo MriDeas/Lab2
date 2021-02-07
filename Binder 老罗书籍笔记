@@ -1,0 +1,122 @@
+智能指针
+   - 当指针指向对象时，需要重载"="运算符，但还远远不够，需要根据具体需求而定
+   - 为强指针(sp)分配对象时，不仅可以使用"="运算符，也可以使用指针的构造函数
+   - 智能指针的析构函数被调用时，应及时调用decSrong释放引用
+
+弱指针
+   - 强引用计数为0时，不论弱引用计数是否为0，都可以delete自己
+   - 弱指针必须升级为强指针才能访问它所指向的对象
+   - 主要解决的问题是循环引用
+
+弱指针和强指针的却别：
+  - 除指向目标对象的m_ptr外，wp中另有一个m_refs指针，类型为weakref_type
+  - 没有重载“->”和“*”等运算符
+  - 有一个promote方法将wp提升为sp
+  - 目标对象的父类不是LightRefBase，而是RefBase、
+
+
+
+1. Binder设备文件打开过程
+
+   - 进程使用Binder机制之前，需要调用open()打开设备文件 /dev/binder来获取一个文件描述符，然后才能通过这个文件描述符来和Binder驱动进行交互，
+     继而和其他进程执行进程间通信。
+
+   打开过程：
+   - 创建一个binder_proc结构体对象proc，并进行初始化
+   - 将proc加入到全局hash队列binder_procs中，由此可知有多少个进程在使用Binder进程间通信机制
+   - 将proc保存在参数filp成员变量private_data中，
+
+2. Binder内存映射过程
+
+   - open /dev/binder文件之后，需要把文件映射到进程空间才能使用Binder进程间通信机制
+   - 映射/dev/binder是为了进程分配内核缓冲区，以便用来传输数据
+   - mmap -> binder_mmap
+             - 参数 vma指向结构体 vm_area_struct，局部变量 vm_struct area，他们分别指向一块虚拟地址空间
+             - 参数filp指向一个打开文件结构体，成员变量private_data转换为binder_proc结构体指针，保存在指针proc中
+             - vm_start和vm_end指向了映射空间范围
+             - 限制内核空间申请大小为4MB
+
+         - 为进程分配内核缓冲区
+            - 调用函数get_vm_area在进程的内核地址空间分配一段大小为vm_start->vm_end大小的空间
+            - 计算要映射的用户空间起始地址和前面获得的内核空间地址的差值，保存在proc->user_buffer_offset中
+            - Binder驱动为进程分配的内核缓冲区地址有两个，一个是用户空间地址，由参数vma->vm_area_struct结构体描述，一个是内核空间地址由变量
+              area->vm_struct结构体描述
+            - 两个地址是连续的，起始地址只相差一个固定值
+            - 进程通过用户空间地址访问内核缓冲区的内容
+
+         - 为进程要映射的虚拟地址vma和area分配物理页面地址 (分配内核缓冲区)
+            - 创建物理页面结构体指针数组，大小为(vm_end -> vm_start)/PAGE_SIZE,每一页虚拟空间都对应一个物理页面 PAGE_SIZE是一个宏，大小为4K
+            - 调用binder_update_page_range函数为虚拟地址空间area分配一个物理页面，并将数组地址保存在proc->page中
+            - 分配成功以后使用一个binder_buffer结构体buffer对象描述该地址，并加入进程结构体proc的内核缓冲区列表buffers
+            - 由于物理页面是空闲的，调用binder_insert_free_buffer函数将它加入进程结构体proc的空间内核缓冲区红黑树free_buffers中
+            - 将进程最大内核缓冲区带下设置为内核缓冲区大小的一半，防止异步事务过度消耗内核缓冲区
+
+
+Binder进程间通信库
+
+ - BnInterface 和 BpInterface
+   Binder库中使用BnInterface和BpInterface分别描述Service组件和Client组件，前者为Binder本地对象，后者为Binder代理对象，而它们又分别对应
+   Binder驱动中的Binder实体对象和Binder引用对象
+    - BpInterface继承了BpRefBase，后者为Binder代理对象提供了抽象的进程间通信接口
+    - BpRefBase继承了RefBase，因此Binder代理对象也可以通过强指针和弱指针维护生命周期
+    - BpRefBase有一个重要的成员变量mRemote，指向一个BpBinder对象，可以通过成员函数remote获取，BpBinder实现了BpRefbase类的通信接口
+    - BpBinder类的成员变量mHandler是一个整数，表示一个Client组件的句柄值
+    - 每一个Client组件都对应一个Binder驱动中的引用对象，每个Binder引用对象都对应一个句柄值，Client组件通过句柄值和Binder驱动中的Binder引用
+      建立对应关系
+    - BpBinder函数transact负责向Server进程的Service组件发送请求，transact函数会把mhandler和数据发送给Binder驱动，驱动再根据句柄值找到
+      对应的Binder引用对象、Binder实体对象，最后将数据发送到Service组件
+
+ - BBinder和INTERFACE
+   - INTERFACE是一个由进程自定义的Service组件接口，以上两者都需要实现该接口
+   - 模板类BnInterface继承了BBinder，后者为Binder本地对象提供了抽象的进程间通信接口，BBinder继承IBinder
+      BBinder：
+        - 两个重要函数：transact和onTransact
+        - 当Binder代理对象通过Binder驱动向Binder本地对象发起请求，Binder驱动会调用Binder本地对象的transact函数处理请求
+        - 成员函数onTransact由BBinder的子类，即Binder本地对象子类实现，负责分发与业务相关的进程间通信请求
+        - BBinder继承IBinder，后者继承RefBase，那么Binder本地对象使用引用计数维护生命周期，而Binder本地对象受到来自Binder驱动
+          中的Binder实体和Client进程的Binder代理对象的引用
+
+ - IPCThreadState和ProcessState
+   - 每个使用Binder进程通信机制的进程都有一个Binder线程池处理进程间通信请求，而每一个Binder线程都有一个IPCThreadState对象
+   - 通过IPCThreadState的self函数获取该对象，其transact函数和Binder驱动交互，具体的交互又有talkWithDriver负责
+   - IPCThreadState内部有成员变量mProcess,指向ProcessState对象，每个使用Binder进程通信机制的进程都有唯一的ProcessState实例
+   - ProcessState对象负责初始化Binder设备，打开Binder文件，实现设备映射，Binder线程池中的每个线程都可以通过它和Binder驱动建立连接
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
