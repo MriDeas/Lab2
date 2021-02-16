@@ -2,6 +2,7 @@ package com.example.cmaker.adapt.binder.server;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -14,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getSystemService(Context.WINDOW_SERVICE);
 
         Intent intent = new Intent(this, BookService.class);
         intent.setAction(BookBinder.DESCRIPTOR_BOOK_BINDER);
