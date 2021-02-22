@@ -1,0 +1,142 @@
+Service 启动流程
+
+数据结构介绍：
+
+ - ServiceRecord AMS端用来描述一个Service组件，继承自Binder
+ - CreateServiceData 应用进程端描述Service组件，内部含 IBinder token、ServiceInfo、Intent
+ - ServiceInfo   Service的描述信息，特别是从清单文件中获取的该组件信息
+ - ConnectionRecord 描述一个服务和应用进程建立的一次通信
+ - AppBindRecord 绑定Service时使用AppBindRecord维护Service与应用之间的关联
+   HashSet<ConnectionRecord> map
+ - IntentBindRecord 描述绑定Service的Intent
+ - ActiveServices 运行于AMS端，管理Service组件
+        - ArrayList<ServiceRecord> mPendingServices 即将启动的Services
+        - ArrayList<ServiceRecord> mRestartingServices 再次启动的Services
+        - ArrayList<ServiceRecord> mDestroyingServices 即将销毁的Services
+        - ArrayMap<IBinder, ArrayList<ConnectionRecord>> mServiceConnections 所有绑定该服务的连接
+
+方式1：startService
+
+      - WMS.startService
+            - retrieveServiceLocked() 寻找与intent匹配的ServiceRecord，没有的话使用PackageManagerService
+              获取对应的信息，封装到ServiceRecord，最后将ServiceRecord封装到ServiceLookupResult中
+                - retrieveServiceLocked 最终会 new 一个ServiceRecord对象
+
+            - startServiceInnerLocked()
+
+                   - bringUpServiceLocked()
+                     清单中可以设置android:process属性指定进程，默认是当前进程，若不存在则调用AMS.getProcessRecordLocked创建
+                     进程，否则调用 -> realStartServiceLocked()
+                   - realStartServiceLocked()
+                      -> app.thread.scheduleCreateService()
+                           调用ApplicationThread的scheduleCreateService创建CreateServiceData，-> handleCreateService
+
+            - ActivityThread handleCreateService(CreateServiceData service)
+                   -  (Service) cl.loadClass(data.info.name).newInstance() 反射方式创建Service组件实例
+                   -  回调Service的attach()、onCreate(),将Service组件和CreateServiceData.token存入mServices
+                      map容器中，token是key，
+                   -  ActivityManagerNative.getDefault().serviceDoneExecuting 通知AMS启动成功
+
+            - onStartCommand回调
+                   - startServiceInnerLocked -> bringUpServiceLocked()
+                         - if r.app != null && r.app.thread != null  -> sendServiceArgsLocked return null;
+                           - sendServiceArgsLocked()
+                             - 如果 ServiceRecord中pendingStarts.size > 0，就一直循环
+                                     - 为StartItem 变量的属性赋值
+                                     - r.app.thread.scheduleServiceArgs(r, si.taskRemoved, si.id, flags, si.intent);
+                                     - 最终进入ActivityThread.handleServiceArgs()
+                                             - 根据token获取Service组件
+                                             - 若ServiceArgsData.taskRemoved 为false，
+                                                   -> res = s.onStartCommand(data.args, data.flags, data.startId);
+                                             - AMS.serviceDoneExecuting(..,res)  通知AMS，并将onStartCommand返回值传递
+                                                  给AMS，
+                                             - AMS serviceDoneExecuting() -> ActiveServices.serviceDoneExecutingLocked
+                                             - 根据res处理Service
+                                                   - Service.START_STICKY_COMPATIBILITY
+                                                   - Service.START_STICKY
+                                                       - r.stopIfKilled = false; //Don't stop if killed.
+                                                   - Service.START_NOT_STICKY
+                                                       - r.stopIfKilled = true;
+                                                   - Service.START_REDELIVER_INTENT
+                                                       - if StartItem !=null
+                                                             - deliveryCount = 0
+                                                             - doneExecutingCount++
+                                                             - r.stopIfKilled = true;
+                                             - onStartCommand默认的返回值是START_STICKY_COMPATIBILITY，根据SDK版本判断
+            - startForeground 启动前台Service
+                    AMS -> setServiceForeground() -> ActiveServices.setServiceForegroundLocked()
+                        -> ServiceRecord r = findServiceLocked(...)
+                           ... 设置notification，修改r中变量，例如 r.foregroundId,r.isForeground
+                        -> r.postNotification() 发出通知
+                        -> updateServiceForegroundLocked() -> AMS.updateOomAdjLocked 通知AMS去更新..
+
+
+方式2 : bindService
+
+      - ContextImpl
+        - bindService
+        - bindServiceCommon(Intent service, ServiceConnection conn,..)
+              - LoadedApk.getServiceDispatcher(conn, getOuterContext(), mMainThread.getHandler(), flags)
+                 注意参数Handler是主线程的Handler，getOuterContext()可以获得Activity的实例
+                 - 该函数将context,ActivityThread,conn封装为ServiceDispatcher（sd）的内部属性，并创建了InnerConnection类型的
+                   Binder对象，该对象又持有了ServiceDispatcher的弱引用，然后以conn为key，以sd为值，将这些存入Map中
+                 - 然后又以Activity为key，将上一步创建的map存入mServices中，因为一个Activity可以绑定多个Service
+                 - 最后返回sd的IServiceConnection类型的Binder对象
+              - 获得 IServiceConnection类型的 sd 后，然后获得Activity的token
+              - AMN.getDefault().bindService(ApplicationThread,token,intent,.,sd,..) 开始绑定服务
+
+              - AMS.bindService -> ActiveServices.bindServiceLocked
+                    - 1 根据IApplicationThread获得源进程的ProcessRecord callerApp对象
+                    - 2 根据token获得绑定Service的activity（ActivityRecord）
+                    - 3 -> retrieveServiceLocked 获得与Intent匹配的Service组件的查询结果 ServiceLookupResult
+                    - 4 重点 -> ServiceRecord.retrieveAppBindingLocked()
+                              - 1 创建IntentBindRecord，存入ArrayMap<Intent.FilterComparison, IntentBindRecord bindings
+                              - 2 创建AppBindRecord，并以ServiceRecord和IntentBindRecord为参数，以ProcessRecord为key，
+                                  以AppBindRecord为value，将数据存入IntentBindRecord对象的  ArrayMap<ProcessRecord, AppBindRecord> apps容器中，返回AppBindRecord对象
+                    - 5 创建ConnectionRecord对象，传入AppBindRecord对象b、ActivityRecord activity
+                        和IServiceConnection connection
+                    - 6 重点 -> bringUpServiceLocked() -> realStartServiceLocked() 启动Service
+                    - 7 realStartServiceLocked() -> requestServiceBindingsLocked()
+                          - 从ServiceRecord的bindings中找到IntentBindRecord
+                          - 重点 -> r.app.thread.scheduleBindService 执行绑定任务，回调应用Service组件的onBind
+                            然后将IntentBindRecord属性 requested = true，hasBound = true
+                          - ApplicationThread -> scheduleBindService()
+                                              -> 创建BindServiceData对象，并赋值,发送消息
+                                              -> handleBindService
+                                              -> 根据token找到Service组件，执行onBind或onRebind，分别调用
+                                                 AMN.getDefault().publishService 或 serviceDoneExecuting()
+                                              -> AMS -> ActiveServices.publishServiceLocked()
+                                                 -> 获得应用Service组件传回的Binder对象，遍历ServiceRecord中所有
+                                                    已建立的连接connections，然后继续遍历获得ConnectionRecord对象，
+                                                    根据Intent匹配找到目标ConnectionRecord，调用其属性IServiceConnection
+                                                    的函数connected()
+                                               -> LoadedApk.ServiceDispatcher.InnerConnection.connected() ->
+                                                   ServiceDispatcher.connected -> doConnected ->
+                                                   ServiceDispatcher..ServiceConnection onServiceConnected()
+                                                   至此，完成了绑定服务的任务
+                    - 8 如果Service已经在运行，那么直接绑定就行了
+                    - 9 如果Service已经绑定，那么就rebind
+
+              - LoadedApk 中有mServices 容器，
+                  - 类型是 ArrayMap<Context, ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher>>
+                    - Context 在调用ContextImpl.bindServiceCommon时由getOuterContext()获得，因此可以视为Activity实例
+                    - ServiceDispatcher 对ServiceConnection、InnerConnection等元素的封装
+                    - InnerConnection 继承自IServiceConnection.Stub,因此是个Binder，内部持有ServiceDispatcher的弱引用，
+                      其connected(..)函数会回调ServiceDispatcher的connected(name, service)函数，其实该类是ServiceDispatcher
+                      的嵌套类
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

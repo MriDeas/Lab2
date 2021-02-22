@@ -1,7 +1,11 @@
 package com.dan.learn.lab2.ui.activity;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.core.app.ActivityManagerCompat;
 
 import com.dan.learn.lab2.R;
 import com.dan.learn.lab2.ui.base.BaseActivity;
@@ -39,6 +43,8 @@ public class RxJavaBasicActivity extends BaseActivity {
     Disposable disposable;
 
     private void binding() {
+
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
 

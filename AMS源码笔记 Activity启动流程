@@ -1,0 +1,175 @@
+Android 29
+
+- AMS 创建和启动
+
+  位置：SystemServer.run
+       - 启动前：系统启动时，SystemServer.main()调用run函数，启动各种Service，在startCoreService函数中
+         ActivityManagerService.Lifecycle.startService 创建并启动AMS
+
+       - 创建：AMS.Lifecycle 类的静态函数startService()传入了参数SystemServiceManager(ssm)并调用了
+         ssm.startService，该函数以反射形式利用Lifecycle的构造函数创建了Lifecycle实例，其构造函数
+         内又以 new的形式创建了AMS实例
+
+       - 启动：AMS实例创建完成后，ssm将Lifecycle加入其中ArrayList mServices集合中管理，然后调用Lifecycle
+         .onStart()函数回调启动AMS.start()函数，启动AMS服务
+
+       - Lifecycle 是AMS的内部静态类，持有AMS和ActivityTaskManagerService实例，继承自抽象类
+         android.server.SystemService
+
+       - SystemService 是抽象类，表示为运行在系统进程中的各种服务，由Lifecycle继承实现其函数
+
+       - 注册 AMS启动之后，在SystemServer中调用 ams.setSystemProcess() 调用ServiceManager.addService
+             将AMS注册到ServiceManager中
+
+       - ActivityTaskManagerService(atms) 在启动AMS之前，SystemServer会以相同的方式创建并启动atms，atms
+         用来管理Activity，相关的数据结构有 ActivityStackSupervisor
+
+       - AMS 启动之初，会创建并启动AMS自身的线程，旧版本中是AThread
+
+
+23版本代码：
+
+- Activity 启动流程
+
+    - ContextImpl startActivity()
+               关键参数：
+                  - getOuterContext() 是启动目标组件的组件Activity或Service
+                  - mMainThread.ApplicationThread 是一个Binder对象，是应用进程内的Binder，AMS和应用通信
+                  - Intent信息
+
+             //第一次进程间通信
+    - Instrumentation.startActivity()
+          -> ActivityManagerNative.gDefault.get - 获取AMS Binder引用，转化成 IActivityManager类型的
+             ActivityManagerProxy。
+
+             //第二次进程通信 利用ActivityManagerProxy的mRemoteBinder对象和AMS通信
+    - ActivityManagerNative.startActivity()
+          -> mRemote.transact()
+
+        ActivityManagerNative(AIDL) 说明：
+        ActivityManagerNative继承自Binder，并实现IActivityManager接口，内部定义了ActivityManagerProxy，
+        并根据 START_ACTIVITY_TRANSACTION 类似的函数标志调用相关的函数，例如：startActivity()、
+        startActivityAsUser()等，但实际上这些函数的实现是在AMS中，因为AMS继承自AMN。
+
+    - AMS -> startActivity() -> startActivityAsUser() 加入了userId，参数IBinder resultTo是
+      ApplicationThread类型的Binder对象，指向调用目标组件的组件所在进程的一个Binder对象
+        - startActivityAsUser()
+            - enforceNotIsolatedCaller 检查调用者是否属于被隔离的进程
+            - handleIncomingUser()  检查调用者是否有权利执行该操作
+
+    - ActivityStackSupervisor -> startActivityMayWait()
+        - resolveActivity()  用PackageManagerService resolveIntent() 解析Intent，返回ActivityInfo
+        - startActivityLocked()(方法1) 继续启动
+             - 确保调用者进程存在，否则返回错误 权限拒绝
+             - 处理FLAG_ACTIVITY_FORWARD_RESULT，具有跨越式传递作用，如A启动B，B启动C使用了标志，
+               C.setResult时会将结果返回给A，而B不能使用startActivityForResult，否则标志报错
+             - 如果没有找到合适的Activity，ActivityInfo为空，直接报错返回
+             - 找到了合适的Activity，进一步判断调用者是否有权限启动指定的Activity
+             - 生成一个ActivityRecord对象 r,记录判断结果
+        - startActivityUncheckedLocked()
+             - 处理启动模式和任务栈
+             - 找到合适的Task
+
+               //有两次跨进程操作 第三四次
+    - ActivityStack -> startActivityLocked()
+        - 目标Activity不在新的Task中，即 !newTask，遍历mTaskHistory找到老的Task，
+        - 找到后，若这个Task对用户仍不可见，要加入mTaskHistory中，并在WMS中注册
+        - 将Activity放在Task的最顶层
+        - 必要的话处理窗口动画
+        - addAppToken 让Activity可查
+        - 处理taskAffinity和FLAG_ACTIVITY_RESET_IF_NEEDED标志
+        - 调用resumeTopActivityLocked 恢复最上层Activity，并pause上一个Activity，过程中AMS会通过
+          ApplicationThread这个Binder对象通知应用进程要pause Activity，然后应用进程pause后跨进程通
+          知AMS已经pause成功，可以执行后续操作
+      //4.3版本 19
+    - ActivityStack -> resumeTopActivityLocked(ActivityRecord prev, Bundle options)
+
+        - -> topRunningActivityLocked() -> ActivityTask.topRunningActivityLocked() 从mTaskHistory中取出ActivityStack中
+             最上面有效的ActivityRecord，满足 !notTop、!finishing、可以显示
+
+        - resumeTopActivityLocked
+           - 结果赋值给函数中next变量，可能为空，为空时启动Launcher主界面
+           - 判断当前正运行的Activity是否是目标对象 mResumeActivity == next && next.state == ActivityState.RESUMED
+           - 若目标Activity正在stopping，终止这一操作。从mStoppingActivities、mGoingToSleepActivities、
+             mWaitingVisibleActivities中将它移除，sleeping标志位false
+           - 准备就绪，若mPausingActivity != null，return false，正在pause前一个Activity；若mResumedActivity!=null，
+             前一个Activity还在运行，执行pause操作。
+                 - pause前一个Activity -> startPausingLocked
+                     - mResumedActivity 置空，mPausingActivity和mLastPausedActivity的值置为前一个Activity，并处理前一个
+                          Activity的一些状态
+                          //第5次跨进程
+                     - 若前一个ActivityRecord prev 的进程存在，调用该进程的ApplicationThread(Binder)schedulePauseActivity
+                       prev.app.thread.schedulePauseActivity(),app是ProcessRecord类型，表示进程，thread是
+                       IApplicationThread类型,prev.appToken(IApplicationToken.Stub)作为参数传入
+
+                         - 将传入的参数token,finished等封装成Message发送给Handler
+                         - handlePauseActivity()
+                                - 根据token找到应用进程的ActivityClientRecord对象，
+                                - -> performPauseActivity()
+                                        - -> mInstrumentation.callActivityOnSaveInstanceState 保存状态
+                                        - -> mInstrumentation.callActivityOnPause(r.activity) 回调Activity的onPause
+                                      //第6次跨进程
+                                - -> ActivityManagerNative.getDefault().activityPaused() 通知AMS prev已经paused
+                                        - AMS activityPaused()
+                                              -> ActivityStack.activityPausedLocked()
+                                              -> ActivityStack.completePauseLocked()
+                                                  - 找到栈顶的ActivityRecord
+                                                    -> ActivityStackSupervisor.resumeTopActivitiesLocked
+                                                    -> ActivityStack.resumeTopActivityLocked()
+                                                       回到了原来的方法，因为前面的步骤已经就绪，那么继续启动新的Activity
+
+           - 若即将启动的Activity不可见，将其添加至mWaitingVisibleActivities中；否则隐藏前一个Activity，即setAppWillBeHiden
+           - 启动新的Activity前，通知WMS前一个显示的Activity即将隐藏
+           - 启动目标Activity，1 -> 进程已启动; 2 -> 进程未启动
+              - 1 进程已启动
+                  - WMS.setAppVisibility(next.appToken, true); 通知WMS目标Activity具备显示条件
+                  - 更新一系列全局变量如mResumedActivity，更新相关统计 AMS.updateCpuStats()，AMS.addRecentTaskLocked等
+                  - next.app.thread.scheduleResumeActivity  第七次跨进程
+                       -> handleResumeActivity() 2811
+                           -> performResumeActivity(IBinder token,.)
+                               - 根据token找到ActivityClientRecord对象r，即Activity
+                               - activity.performResume() 处理Activity内部Fragments onResume，有的话
+                               - 若 r==null,则通知AMS：
+                                       AMN...finishActivity(token, Activity.RESULT_CANCELED,
+                               - 通过r获得Window和DecorView，通过Activity获得WindowManager， -> wm.addView(decor, l);
+
+                                 //第八次跨进程
+                               - 通知AMS ActivityResumed: AMN.get.activityResumed(token)
+                               - AMS.activityResumed
+                                      - ActivityRecord.activityResumedLocked(token);  更新ActivityRecord内部参数
+                  - 若在resume环节发生异常，比如目标Activity还未启动，但是进程已存在，这时异常被捕获，然后调用
+                    startSpecificActivityLocked -> realStartActivityLocked()
+
+              - 2 进程未启动
+                  - mStackSupervisor.startSpecificActivityLocked
+                    - app != null && app.thread != null
+                          - realStartActivityLocked()
+                             -> app.thread.scheduleLaunchActivity 创建Activity并回调onCreate等函数，return
+                    - AMS startProcessLocked(1)
+                           - newProcessRecordLocked() 创建ProcessRecord并初始化
+                           - -> startProcessLocked(2) 启动目标Activity所在进程
+                                - 根据上一步创建的ProcessRecord的已初始化信息，调用Process.start创建进程
+                                - Process.start()
+                                     - 调用start时，会传入 "android.app.ActivityThread"，作为即将创建的进程
+                                     - startViaZygote() -> zygoteSendArgsAndGetResult()
+                                     - openZygoteSocketIfNeeded() 必要的话打开面向zygote进程的scoket
+                                     - 利用上一步创建的sZygoteWriter写入参数，发送给zygote进程,zygote会fork一个新的
+                                       进程
+                                     - 创建ProcessStartResult实例，并sZygoteInputStream.readInt()读取返回值
+                                       进程id:pid，赋值给ProcessStartResult.pid
+                                     - ZygoteInit的main函数注册了服务端的socket，监听来自其他进程的socket信息
+                                     - ZygoteInit的main函数中调用runSelectLoop(),遍历获取新的连接ZygoteConnection
+                                     - 调用连接的runOnce(),继而调用Zygote.forkAndSpecialize 孵化新的进程并返回pid
+                                     - 以流的形式将结果返回
+                                - 启动成功后，将ProcessRecord打包发送给Handler，然后由processStartTimedOutLocked()函数
+
+
+
+总结：
+
+   - Activity所对应的数据结构，服务端是ActivityRecord，应用进程端是ActivityClientRecord
+   - ActivityRecord中全局变量 IApplicationToken.Stub appToken 和 ActivityClientRecord中的IBinder token是一致的，用来标识
+     远程AMS的中一个与本地ActivityClientRecord描述的Activity对象的ActivityRecord对象
+   - 目标Activity所属进程未启动时，在启动过程中会调用attachApplicationLocked和realStartActivityLocked
+   - 若目标Activity所属进程已经启动，但目标Activity还未创建，会调用realStartActivity启动该Activity
+   - 若目标Activity已启动，接下来需要根据启动模式来判断，是否创建新的任务栈和新的Activity实例
