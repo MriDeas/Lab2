@@ -1,0 +1,79 @@
+
+- 注册广播
+
+ContextImpl
+      - registerReceiver(receiver,filter)
+      - registerReceiver(receiver,filter,String broadcastPermission, Handler scheduler)
+      - registerReceiverInternal(receiver,filter,broadcastPermission,scheduler,outContext)
+          - -> rd = new LoadedApk.ReceiverDispatcher 将receiver、context、schedule封装成ReceiverDispatcher
+            - rd内部有内部类 InnerReceiver ，是一个继承自 IIntentReceiver.Stub 的Binder对象
+            - InnerReceiver 内部持有rd的弱引用和强引用
+            - InnerReceiver 其函数performReceive会在rd不为空是调用rd.performReceive函数
+            - InnerReceiver performReceive函数中rd为空，则通知AMS.finishReceiver
+            - InnerReceiver 和绑定Service时的IInnerConnection一样，用于AMS回调rd的函数，继而接收者受到通知
+            - ReceiverDispatcher 的performReceive函数，会将传入参数包装成Args类型对象，然后由之前传入的
+                                 ActivityThread.Handler.post()到主线程消息队列
+            - Args 是rd的内部类，继承自BroadcastReceiver.PendingResult,实现了Runable接口，其run
+                   函数中主要回调了 BroadcastReceiver.onReceive()函数，若receiver为空，或执行发生
+                   异常或者执行完毕后，通知AMS.finishReceiver()
+
+ActivityManagerService(AMN.getDefault())
+
+      - AMS.registerReceiver(ApplicationThread,callerPackage,IIntentReceiver,IntentFilter,permission,userId)
+      - 1 根据ApplicationThread获取注册者所在进程描述对象ProcessRecord,可能为空
+      - 2 创建ReceiverList列表 rl,将rl添加至ProcessRecord.receivers列表中，然后将以IIntentReceiver.asBinder获得的
+          InnerReceiver类型的Binder对象为key，以rl为value，将数据存入AMS的Map容器 mRegisteredReceivers 中。
+      - 3 创建BroadcastFilter bf，并传入了IntentFilter、rl、permission等参数，将bf加入rl
+            - BroadcastFilter用来描述注册的广播接受者
+      - 4 将BroadcastFilter bf加入到IntentResolver类型的mReceiverResolver中，这样当AMS接收到广播时就可以找到对应的
+          广播接受者了
+      - 5 若前几部步中查找到的粘性广播不为空，开始遍历处理
+                - 获取 BroadcastQueue queue，并创建BroadcastRecord Binder对象 r，将r加入队列
+                - 调用queue.scheduleBroadcastsLocked -> handler.send.. -> processNextBroadcast 处理粘性广播事件
+
+- 取消注册
+    ContextImpl.unregisterReceiver -> AMS.unregisterReceiver(IIntentReceiver receiver) 最终还是在AMS中执行
+
+    - AMS 根据receiver在 mRegisteredReceivers中找到对应的 ReceiverList rl
+    - AMS 调用 finishReceiverLocked
+    - AMS rl.app.receivers.remove(rl); 从ProcessRecord的receivers中删除rl
+    - AMS -> removeReceiverLocked()
+             - 从mRegisteredReceivers中删除IIntentReceiver key 和 value rl
+             - 从 mReceiverResolver中删除 BroadcastFilter
+    - AMS 释放rl.receiver(IIntentReceiver).asBinder.unlinkToDeath Binder对象
+
+
+- 发送广播
+
+   - ContextImpl -> AMS.broadcastIntent(ApplicationThread,intent, resolvedType,...)
+   - AMS .broadcastIntent
+          - verifyBroadcastLocked(intent) 验证广播是否合法
+                  - 判断Intent是否为空并且有文件描述符
+                  - 获得Intent的flag，判断如果系统正在启动 - 只接收动态广播，否则判断flag在没有设置为
+                    FLAG_RECEIVED_REGISTERED_ONLY(只接收动态注册的广播接受者)，则抛出异常
+          - 调用getRecordForAppLocked获得发送者所在的进程信息ProcessRecord，获得调用者的 pid、uid
+          - -> broadcastIntentLocked
+               - 将动态注册的广播接受者和静态注册的广播接受者按照优先级高低存储在不同的列表中，然后合并至receivers中，
+               - receivers中包含所有的广播接收者(无序、有序)
+               - 创建BroadcastRecord对象并将receivers传进去，调用BroadcastQueue.scheduleBroadcastsLocked()
+
+- BroadcastReceiver的调用过程
+
+  BroadcastQueue -> scheduleBroadcastsLocked()
+      - 通过Handler发送消息，继而执行processNextBroadcast函数
+      - -> processNextBroadcast
+           - 遍历mParalleBroadcasts无序广播列表，调用 -> deliverToRegisteredReceiverLocked()函数将广播发送到接受者
+        -> deliverToRegisteredReceiverLocked
+           - 检查广播发送者和广播接收者权限
+           - performReceiveLocked(...)
+        -> performReceiveLocked
+           - app.thread.scheduleRegisteredReceiver(...) 交由接收者所在进程处理广播
+              - 调用IIntentReceiver类型对象receiver的performReceive方法，进而调用ReceiverDispatcher.performReceive，
+        -> ReceiverDispatcher.performReceive
+           - 将广播信息包装为 Args对象，然后由接收者所在进程的主线程Handler.post到消息队列执行，其run()函数调用
+             BroadcastReceiver对象receiver的onReceive()函数
+
+
+- 广播接收者onReceive函数中的Context实际上是注册广播时传入的Context
+- IIntentReceiver和IActivityManager一样使用了AIDL，采用了进程间通信，InnerReceiver继承自IIntentReceiver.Stub，是Binder
+  通信的服务端(位于接收者所在应用进程)，IIntentReceiver类型对象 receiver则是客户端，是InnerReceiver的本地代理
