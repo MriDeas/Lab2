@@ -1,0 +1,54 @@
+Activity 启动模式 - 任务栈分析
+
+- launchMode
+- taskAffinity
+- allowTaskReparenting
+- flag
+
+
+- 启动模式分析（1） 单进程模式
+
+  - standard  默认模式，会启动一个新的Activity实例放入Task任务栈中，该模式下为Activity设置单独的taskAffinity没有效果，仅有一个任务栈
+
+  - singleTop
+          - 若任务栈中已有该实例且正在和用户产生交互(栈顶) ,则回调该实例的onNewIntent()函数，在此之前会回调该实例的onPause函数，该函数执行后会回调onResume函数
+          - 若当前任务栈中没有该实例，则会创建新的实例放入栈顶，同standard
+          - 该启动模式没有影响任务栈的创建和数量
+  - singleTask
+        - 相同的taskAffinity
+          - 该模式不会创建新的任务栈
+          - 若任务栈中有该实例，则会清除该实例以上的其他Activity实例，并回调该实例的onNewIntent()函数和onRestart、onStart、onResume生命周期，
+            其次会在onNewIntent之前调用上一个Activity实例的onPause、然后在onResume之后回调上一个Activity实例的onStop、onDestroy
+
+        - 不同的taskAffinity
+          - 若新启动的Activity实例指定了不同的taskAffinity，该模式下会创建新的任务栈并将该实例放入新的任务栈中的顶部
+          - 指定了singleTask模式的Activity启动新的Activity时，若新的Activity的taskAffinity没有指定(默认和之前的任务栈一致)或者指定和之前的任务栈一致，那么新的Activity
+            实例会放进指定了singleTask模式而创建的新的任务栈中，而不是在此之前的任务栈中（前提是新启动的Activity的启动模式是standard）,当前应用会出现两个任务栈在系统最近
+            任务列表中，此时按HOME键返回桌面再点击应用图标启动应用，则出现的是启动singleTask模式Activity的源Activity
+
+
+  - singleInstance
+        - 相同的taskAffinity
+             - 此时设置该模式的Activity实例会出现在新的任务栈顶部
+             - 以该模式启动的Activity所在的任务栈，若按Home键返回桌面，然后再点击应用图标启动该应用时，该Activity所在的任务栈仍将保留，但Activity处于隐藏的状态，手机最近任务里
+               仅会显示一个任务栈，当再次启动该Activity时，则会回调该Activity的onNewIntent函数，取消隐藏
+             - 在singleInstance模式的Activity中启动标准模式的Activity，新的Activity实例会出现在启动singleInstance模式Activity的源Activity实例所在的任务栈的栈顶，也就是
+               当前该应用(单进程情况)中有两个任务栈。
+                  - 返回键  此时点击返回键，新的Activity退出，而启动singleInstance模式Activity的源Activity所属的任务栈恢复，该Activity恢复在栈顶
+             - 继续以上例子，当新启动的Activity(standard)实例再次启动singleInstance模式Activity时，目标Activity会回调onNewIntent()函数，而新的Activity则会
+               -> onSaveInstanceState  -> onStop，最终处于onStop状态。
+             - 假设 A、B、C三个Activity，其中B是singleInstance模式，启动关系如下 -> A -> B -> C，此时依次按返回键返回，在C中按返回键会让A处于栈顶，在A中继续按返回键
+               B将会出现
+
+ - 启动模式分析（2 多进程模式）
+
+   - standard
+       -
+
+
+- taskAffinity & 启动模式分析
+
+
+
+
+

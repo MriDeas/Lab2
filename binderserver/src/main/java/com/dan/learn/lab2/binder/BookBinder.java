@@ -2,6 +2,7 @@ package com.dan.learn.lab2.binder;
 
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 
@@ -17,6 +18,11 @@ public abstract class BookBinder extends Binder implements IBookManager {
     static final int TRANSACTION_getBooks = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);
 
     public static final String DESCRIPTOR_BOOK_BINDER = "descriptor_book_binder";
+
+    @Override
+    public void attachInterface(@Nullable IInterface owner, @Nullable String descriptor) {
+        super.attachInterface(owner, descriptor);
+    }
 
     @Override
     protected boolean onTransact(int code, @NonNull Parcel data, @Nullable Parcel reply, int flags) throws RemoteException {
