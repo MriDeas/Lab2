@@ -42,12 +42,30 @@ Activity 启动模式 - 任务栈分析
 
  - 启动模式分析（2 多进程模式）
 
+   - 应用P1和应用P2，P1的应用Activity成为P1-Act-1，应用P2的Activity成为 P2-Act-1
+
    - standard
-       -
+       - 该模式下由P1的Act-1（singleTask或standard模式）启动P2-Act-1(standard模式)，则二者将位于同一任务栈中
+       - 若P1进程的Activity是singleInstance模式，P2=Act-1(standard或singleTask模式)，则两个Activity位于两个不同的栈中
+       - Home键 -> standard模式的P1-Act-1启动standard模式的P2-Act-2，二者处于相同任务栈中，按下HOME键再点击P1图标，P1进程的Act-2仍位于
+         P1-Act1的任务栈中，点击返回键后P2-Act2将从此任务栈中退出
+       - 若P1-Act-1是singleTask模式，启动P2-Act-2(standard模式)二者将位于同一任务栈中
+   - singleTask
+       - 若P1-Act-1启动P1-Act-2,Act-2是singleTask模式且taskAffinity与Act-1所处的task不同，P1-Act2在启动P2-Act-2时：
+           - 若P2-Act-2的启动模式是singleTask模式且其taskAffinity是和P1-Act-1相同，那么P2-Act-2将和P1-Act-1处于相同的栈中,此时
+             按HOME键之后再点击P1的图标，显示的页面是P2-Act-2，点击返回键则返回至P1-Act1页面
 
 
-- taskAffinity & 启动模式分析
 
+- allowTaskReparenting
+    - P1-Act1 启动P2-Act2，P2-Act2的allowTaskReparenting=true，此时返回桌面再点击P1的图标，P2-Act2从P1-Act1的任务栈中消失
+    - P1-Act1 启动P2-Act2，P2-Act2的allowTaskReparenting=true，按HOME键，点击P2应用的图标，P2-Act2从P1-Act1的任务栈中消失出现在
+      P2应用的任务栈中
+
+ - 总结
+   - 除singleInstance模式以外，taskAffinity和singleTask模式结合，才能创建出新的任务栈
+   - 不同的taskAffinity所修饰的Activity可以存在于相同的任务栈中，前提是被启动的Activity没有设定singleTask模式或singleInstance模式
+   - singleTask模式下，不同的taskAffinity修饰的Activity只会存在于相同的TaskAffinity的Activity的任务栈
 
 
 

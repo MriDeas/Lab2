@@ -64,7 +64,7 @@
     taskAffinity相同的Task后入栈，或者创建新的Task然后入栈
 
   - 查看最近任务时，展示所有的Task，但它们的taskAffinity需要不一样；单个APP可以拥有
-    多个taskAffinity，但是至多有一个显示在最近任务列表里
+    多个taskAffinity，但是至多有一个显示在最近任务列表里 （不确认正确）
 
 - singleTop
    - 和默认的standard一样，启动时不考虑taskAffinity，将创建的Activity加入当前

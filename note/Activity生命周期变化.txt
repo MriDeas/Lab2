@@ -1,0 +1,64 @@
+- 生命周期和关键关联函数
+  - onCreate(Bundle savedInstanceState) / onCreate(Bundle savedInstanceState, PersistableBundle persistentState)
+  - onStart / onRestart
+    - onRestoreInstanceState //在onStart之后调用，当Activity发生异常
+  - onResume
+  - onPause
+  - onStop
+    - onSaveInstanceState //调用通常在onStop之后
+  - onDestroy
+
+- 1. 锁屏时的生命周期变化
+
+  - onPause
+  - onStop
+  - onSaveInstanceState
+
+  - 锁屏时启动Activity并不会真正启动目标Activity组件，而是当当前页面可见时才会启动
+  - 当屏幕解锁时，栈顶的Activity会回调如下生命周期函数
+    - onRestart
+    - onStart
+    - onResume
+
+- 2. 启动另一个Activity时的生命周期变化
+
+  - 假设A启动B，生命周期变化如下
+    - A.onPause
+    - B.onCreate
+    - B.onStart
+    - B.onResume
+    - A.onStop
+    - A.onSaveInstanceState
+
+  - 假设在B页面按返回键
+    - B.onPause
+    - A.onRestart
+    - A.onStart
+    - A.onResume
+    - B.onStop
+    - B.onDestroy
+
+- 3. 启动一个Activity后按下HOME键
+    - A.onPause
+    - A.onStop
+    - A.onSaveInstanceState
+
+   - 紧接着点击应用图标后的生命周期变化
+     - A.onRestart
+     - A.onStart
+     - A.onResume
+
+   - 当用户点击手机应用最近任务键查看时，生命周期变化和第3部分一样
+
+
+- 4. Dialog不会影响Activity的生命周期
+
+
+- 关于应用中发生异常时Activity的处理
+  - 当应用中仅有一个Activity实例在任务栈中时，此时发生异常应用进程将会销毁，但其任务栈仍存在于AMS最近的任务列表中
+  - 若有多个Activity在任务栈中，栈顶Activity将被销毁，页面停留在新的栈顶Activity(原栈顶的下面的Activity)
+  - 应用内可见的Activity组件都将重建，重建时都会回调onRestoreInstanceState函数
+  - 以上情况是在同一个任务栈中的情况,若不在同一栈中，情况比较复杂，目前测试得出的结果是：
+        - 系统会销毁应用位于靠近栈顶的两个Activity组件(若应用中已启动的Activity组件超过两个)
+  - 应用闪退时，栈顶的Activity生命周期函数不会在被回调
+  - 若异常发生在Service组件而不在Activity组件里，以上情况也是正确的
