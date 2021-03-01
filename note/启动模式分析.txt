@@ -75,6 +75,12 @@
   - standard 和 singleTop，多用于APP内部
   - singleInstance，多用于开放给外部来共享使用
   - singleTask 内部交互和外部交互都会用得上
+  - 启动新的Activity（其taskAffinity与启动它的Activity所处的栈的taskAffinity不同）并设定 flag为FLAG_ACTIVITY_NEW_TASK，
+    被启动的Activity栈中或栈顶还有其他Activity，当再次以相同方式启动该Activity时，该Activity的栈仍保留原样
+  - clearTaskOnLaunch 若Activity的该属性被设置true，每次启动该Activity时(如按HOME键、再次点击图标启动、在其他Activity中启动，不包括在最近任务列表切换查看)
+    时，该Activity所在的任务栈将只保留根Activity
+  - alwaysRetainTaskState true，即使过了很长时间，该任务栈也会将所有Activity保留在栈中
+  - finishOnTaskLaunch -> 针对单个Activity组件而非任务栈，-> true，启动该组件所在的任务栈时，该Activity将会出栈
 
 
 
