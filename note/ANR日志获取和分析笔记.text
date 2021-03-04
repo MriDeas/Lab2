@@ -1,0 +1,110 @@
+1. 常见ANR的一些情况
+
+   - 应用程序在执行一些涉及主线程的I/O慢速操作
+   - 该应用程序正在主线程上进行长时间的计算
+   - 主线程被阻塞，等待另一个线程上正在进行的长时间操作的同步块
+   - 主线程和其他线程处于死锁状态
+   - 主线程正在同步方式调用另一进程，需要长时间等待另一进程返回结果
+
+2. ANR 日志字段分析
+
+   - main 表示主线程，如果是线程，会命名为thread-x，x是线程id
+   - prio 线程优先级
+   - tid  线程唯一标识id
+   - group 线程组名称
+   - sCount 线程被挂起次数
+   - dsCount 线程被调试器挂起次数
+   - obj 对象地址
+   - self 该线程Native地址
+   - sysTid 线程号（主线程线程号和进程号相同）
+   - nice  线程调度优先级
+   - sched = 0/0 分别表示线程的调度策略和优先级
+   - cgrp 调度归属组
+   - handle 线程大狐狸函数的地址
+   - state 调度状态
+   - schedstat（0 0 0） 三个值分别表示线程在CPU上执行时间、线程等待时间和线程执行时间片长度(不支持该项的值都是0)
+   - utm 线程用户态下使用的时间值，单位是jiffies
+   - stm 线程在内核态下调度时间值
+   - core 最后执行该线程的CPU核的序号
+
+3. ANR在不同组件中的时间限制
+
+   - KeyDispatchTimeout   5秒内没有完成将发生ANR  关键字：Input event dispatching timed out
+   - BroadcastTimeout    关键字：Timeout of broadcast BroadcastRecord
+          - 前台  onReceiver 10秒内未处理完成时触发
+          - 后台  onReceiver 60秒
+   - ServiceTimeout      关键字：Timeout executing service
+          - 前台Service  onCreate、onStart、onBind等生命周期在20秒内未完成触发
+          - 后台Service  生命周期函数同上，200秒内未完成时触发
+   - ContentProviderTimeout  关键字：timeout publishing content providers
+          - ContentProvider 10秒内未完成时触发
+
+ 4. ANR 分析的步骤
+
+   - 确定ANR发生时间
+     - am_anr
+     - ANR_IN
+   - 查看ANR 存储文件目录 /data/anr/..  中的anr日志文件
+   - 查看系统耗时的关键字：binder_sample,dvm_lock_sample,am_lifecycle_sample,binder thread
+   - 结合源码和以上的信息进行分析
+
+   举例：
+
+    1. 首先是要 abd bugreport file_and_path 将手机中的错误日志导出
+    2. 导出文件夹中重点关注 bugreport-机型信息-导出时间.txt 和 FS/data/anr目录下的anr日志文件
+    3. 确定ANR的发生
+        - 3.1 在bugreport开头的文件中搜索 am_anr关键字：
+
+        03-03 11:59:02.599  1000  1485  1550 I am_anr  : [0,18089,com.mimi.xichelapp,955825734,Input dispatching timed out (Waiting to send non-key event because the touched window has not finished processing certain input events that were delivered to it over 500.0ms ago.  Wait queue length: 15.  Wait queue head age: 5658.1ms.)]
+
+        上面这段信息主要是anr日志发生 时间、进程id、包名、ANR类型和原因分析
+
+        - 3.2 在上面文件中搜索 "ANR in" 关键字，会找到anr发生的包名、类名，以及Reason信息和CPU占用
+
+              - ANR in com.mimi.xichelapp (com.mimi.xichelapp/.activity3.MimiSaasActivity)
+              - Reason: Input dispatching timed out (Waiting to send non-key event ..
+              - CPU usage 信息
+
+                eg:
+
+                 - ActivityManager: ANR in com.mimi.xichelapp (com.mimi.xichelapp/.activity3.MimiSaasActivity)
+                 - .. : PID: 9577   -> (进程id)
+                 - Reason: Input dispatching timed out (Waiting to send non-key event because the touched window
+                   has not finished processing certain input events that were delivered to it over 500.0ms ago.  Wait queue length: 8.  Wait queue head age: 5822.3ms.) ->（原因）
+                 - .. : Load: 2.7 / 2.17 / 1.69  -> (Load表明是1分钟,5分钟,15分钟CPU的负载)
+                 - .. : 42% （CPU占用率）7528/com.tencent.android.qqdownloader:daemon: (用户态使用率)29% user
+                        + （内核态使用率）12% kernel / faults: 3769 minor 25 major
+                 - .. : 22% 1485/system_server: 10% user + 11% kernel / faults: (高速缓存缺页次数)5013
+                        (内存缓存缺页次数)minor 47 major
+
+                 注：
+                    - ANR in对应的ANR的时间点往往是比am_anr的时间点是靠后的,一般不使用这个时间确定ANR发生的具体时间点
+                    - cpu占用95%有时候并不算高，在多核中每个核最大占用率都是100%（八核占用率是800%）
+                    - 该关键字可能因不同的手机品牌有异
+
+    4. 查看anr日志给出的堆栈信息
+       - 根据上面anr的简略信息和发生时间找到对应的anr日志文件
+       - 注意 "main"开头的文件信息，观察其调用栈，可以据此看到对应的ANR发生时的调用流程
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

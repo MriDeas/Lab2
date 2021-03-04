@@ -1,6 +1,6 @@
 package com.dan.learn.lab2.test;
 
-public class Son extends Parent {
+public class Son extends Parent implements IHuman{
 
     public static final String HEY = "world";
     public static String MSG = "msg from son";
@@ -11,5 +11,10 @@ public class Son extends Parent {
 
         System.out.println("-------------- 打印1：" + msg1);
         System.out.println("-------------- 打印2：" + msg2);
+    }
+
+    @Override
+    public void work() {
+
     }
 }
