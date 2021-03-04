@@ -61,11 +61,11 @@
      - onMeasure(int widthMeasureSpec, int heightMeasureSpec)
         - 调用setMeasuredDimension(width，height)将所获得的宽高保存，具体过程如下：
            - 1 -> getSuggestedMinimumWidth(),判断background是否为空，是的话返回mMinWidth或mMinHeight的值，否则选择
-                backrgound.getMinimumWidth/Height()和 mMinWidth/mMinHeight的最大值.
+                background.getMinimumWidth/Height()和 mMinWidth/mMinHeight的最大值.
            - 2 -> getDefaultSize(getSuggestedMinimumWidth(int,int))
-                   - 获得尺寸(sepcSize)和测量模式(specMode)
-                   - 如果specMode是AT_MOST或EXACTLY，那么将给定的尺寸作为结果返回，AT_MOST对应了wrap_content，EXACTLY对应了具体的大小值或match_parent
-
+                   - 获得尺寸(specSize)和测量模式(specMode)
+                   - 如果specMode是AT_MOST或EXACTLY，那么将给定的测量结果作为结果返回，EXACTLY对应了具体的大小值或match_parent
+                   - 如果当前View没有指定specMode，即UNSPECIFIED，那么View的尺寸是其背景大小或其mMinWidth/mMinHeight
 
 
    - ViewGroup的测量
@@ -80,28 +80,96 @@
 
                  - getChildMeasureSpec(parentWidthMeasureSpec,mPaddingLeft + mPaddingRight, lp.width)  根据父View测量模式信息获得子View的测量信息
 
-                   - getChildMeasureSpec(int spec, int padding, int childDimension)
+                   - getChildMeasureSpec(int spec, int padding, int childDimension)   父View策略的关键
                             - 1 获得父View的specMode以及specSize，并且根据specSize - padding后和0之间取一个较大的值
                             - 2 判断specMode为不同的模式时，结合子View的大小计算出子View的MeasureSpec
-                                   - 2.1  MeasureSpec.EXACTLY  父View有确定的大小
+                                   - 2.1  MeasureSpec.EXACTLY  父View有确定的尺寸
                                           - 子View的宽高信息>=0，子View的宽高不变，子View的specMode是EXACTLY
                                           - 子View的宽高是MATCH_PARENT,子View的尺寸是父View的尺寸大小，子View的specMode是EXACTLY
                                           - 子View的宽高是WRAP_CONTENT，子View的尺寸仍是父View的尺寸大小，但其specMode实AT_MOST
 
+                                   - 2.2 MeasureSpec.AT_MOST
+                                         - 若child的大小 >= 0，child的specMode将是MeasureSpec.EXACTLY
+                                         - 若child的大小是 MATCH_PARENT，那么child的specMode将是MeasureSpec.AT_MOST，其尺寸将是父控件大小减去padding的结果
+                                         - 若child的大小是 WRAP_CONTENT，child的specMode将是AT_MOST，其尺寸将是父控件减去padding的结果
+
+                                   - 2.3 MeasureSpec.UNSPECIFIED 父View没有明确指定
+                                         - child的尺寸 >= 0,则其specMode将是EXACTLY
+                                         - child尺寸是 MATCH_PARENT，其specMode将是 UNSPECIFIED，其大小将是0或者父控件大小减去padding
+                                         - child尺寸是 WRAP_CONTENT，其specMode和size将和上一步一样
 
                  - child.measure(childWidthMeasureSpec, childHeightMeasureSpec)
 
+测试记录：
+
+- 1 父View有确定的大小，子View大小是wrap_content或match_parent，子View的尺寸将是父View的大小减去padding
+- 2 父View大小指定match_parent，父View的specMode将是EXACTLY或者AT_MOST，
+             - child的大小是match_parent时，child尺寸将是父View大小减去padding
+             - child的大小是wrap_content时，child的尺寸将是父View大小减去padding
 
 
 
+- 测量总结
+  - 测量并不决定View最终的大小，测量还可能发生多次
+  - MeasureSpec的mode和LayoutParams有一定的关联：
+    - UNSPECIFIED = 0 ： 父对象没有强制要求子对象必须遵循哪些约束
+    - EXACTLY = 1 ：父对象要求子对象必须遵守它给定的值来约束自己    对应MATCH_PARENT
+    - AT_MOST = 2 ：子对象可以自行选择给定返回内的值               对应WRAP_CONTENT
 
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+- ViewTree的基本工作方式
+  - ViewTree 内部请求更新UI时，请求会沿着View Tree层层往上传递，最终到达ViewRoot。这个ViewTree的管理者再根据实际情况采取相应措施(发起一次遍历，是否通知WMS)
+  - 外部的状态更新，比如WMS回调ViewRoot通知界面带下改变、触摸事件，按键事件等
 
+  - ViewRoot处理这些请求的方式一般是把事件请求入队再依次处理。ViewRoot内部定义了ViewRootHandler类对这些消息统一处理，此Handler和主线程的MessageQueue关联，所以
+    ViewRoot相关操作是位于主线程，避免在主线程有耗时操作
 
+- ViewTree的遍历时机
 
+  - 1. 应用程序初启动时
+    - 构造ViewTree的过程中会调用ViewRootImpl.setView() -> requestLayout() 执行第一次遍历
+  - 2. 外部事件
+    - 触摸事件、按键事件等
+  - 3. 内部事件
+    - 3.1 View.requestLayout -> .. Parent ..-> ViewRoot scheduleTraversals
+    - 3.2 View.setLayoutParams -> requestLayout()
+    - 3.3 View.invalidate()  -> ..Parent invalidateChild() -> ViewRoot invalidateChildInParent
+          ViewGroup和ViewRoot都有invalidateChild函数，但是其区别很大，前者是"自下而上"沿着ViewTree回溯手机dirty区域的过程；后者则是"自上而下"发起真正的ViewTree的遍历
+    - 3.4 dispatchAppVisibility()
+          - 当应用程序可见性发生变化(如startActivity时，前一个Activity的可见性变化)，ViewRootImpl收到Visibility变化时会组织一次遍历
 
+- performMeasure()的调用条件
 
+  - mLayoutRequested==true，且当前不处于stopped状态
+  - mWindowSizeMayChange（窗口大小可能发生变化，如当前宽高和期望值不同）
+  - 假设当前有layout需求，并且window size需要改变，那么windowShouldResize==true
+
+- performLayout()
+  - 当mLayoutRequested==true && !mStopped，此时会调用performLayout
+  - layout() -> onLayout()遍历子View并调用子View的layout函数
+
+- performDraw()
+  - 将在画板上产生的UI数据，在适当的实际由SurfaceFlinger进行整合，最终显示到屏幕
+  - Canvas底层实现是Surface
+  - 图形的绘制方式分为硬件和软件绘制两种
+  - 软件绘制渲染方式：
+    - lockCanvas 必须在使用Canvas时显式的锁定它，draw完成后的Canvas信息透过Surface交给SurfaceFlinger，由后者统一合成渲染到Framebuffer中
+
+  - Java层的Canvas和Surface在native层对应的类分别是SkCanvas和Surface，后两者由C++实现
+
+  - 一旦ViewRoot成功lock到Canvas后，它就可以通过ViewTree的根元素(DecorView)逐步把这个画布往下传输
+    - drawSoftware -> mView.Draw(canvas) ViewTree遍历绘制的起点
+  - 绘制的步骤
+     - 1 绘制背景
+     - 2 保存canvas的layers，以备后续fading所需
+     - 3 绘制内容区域
+     - 4 绘制子对象
+     - 5 绘制fading
+     - 6 绘制decorations 例如scrollbar
+  - 并不是所有的View对象会去绘制，那些View的内容没有任何变化的View对象，就没有必要浪费资源去进行重绘，而父View必须能够
+    严格把控整个draw流程
 
 
 
