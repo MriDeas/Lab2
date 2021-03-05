@@ -16,6 +16,7 @@ public class Student  implements Parcelable {
     private String grade;
     private int dorm;
 
+    public Student(){};
     protected Student(Parcel in) {
         name = in.readString();
         age = in.readInt();

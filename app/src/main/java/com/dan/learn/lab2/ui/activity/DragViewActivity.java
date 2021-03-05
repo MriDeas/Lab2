@@ -1,6 +1,7 @@
 package com.dan.learn.lab2.ui.activity;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dan.learn.lab2.R;
+import com.dan.learn.lab2.entity.Student;
 import com.dan.learn.lab2.ui.base.BaseActivity;
 
 import java.util.ArrayList;
@@ -38,13 +40,22 @@ public class DragViewActivity extends BaseActivity {
 
     private void bindingData(ListView lv) {
         List<String> data = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 1000; i++) {
             data.add("hello " + i);
         }
 
         ListViewAdapter adapter = new ListViewAdapter(data);
         lv.setAdapter(adapter);
+        makeObject();
     }
+
+    private void makeObject(){
+        long begin = System.currentTimeMillis();
+        long end = System.currentTimeMillis();
+        long diff = end - begin;
+        System.out.println("打印时间戳 --------------- " + diff);
+    }
+
 
     private class ListViewAdapter extends BaseAdapter {
 
@@ -74,6 +85,7 @@ public class DragViewActivity extends BaseActivity {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.item_group_title, parent, false);
             }
+            SystemClock.sleep(3);
             TextView tv_group_title = convertView.findViewById(R.id.tv_group_title);
             tv_group_title.setText(getItem(position));
             return convertView;

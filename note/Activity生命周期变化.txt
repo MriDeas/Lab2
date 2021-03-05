@@ -52,7 +52,7 @@
 
 
 - 4. Dialog不会影响Activity的生命周期
-
+     - 当Activity中含有正在showing的Dialog时，按Home键，此时Activity的生命周期会回调 onPause() -> onStop()，不会onDestroy()
 
 - 关于应用中发生异常时Activity的处理
   - 当应用中仅有一个Activity实例在任务栈中时，此时发生异常应用进程将会销毁，但其任务栈仍存在于AMS最近的任务列表中
